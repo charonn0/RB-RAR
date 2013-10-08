@@ -40,6 +40,15 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Function IsRARArchive(Arch As FolderItem) As Boolean
+		  Dim bs As BinaryStream = BinaryStream.Open(Arch)
+		  Dim israr As Boolean = (bs.Read(4) = "Rar!")
+		  bs.Close
+		  Return israr
+		End Function
+	#tag EndMethod
+
 	#tag ExternalMethod, Flags = &h0
 		Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
 	#tag EndExternalMethod
@@ -125,6 +134,9 @@ Protected Module UnRAR
 	#tag Constant, Name = Flag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
 	#tag EndConstant
 
+	#tag Constant, Name = Flag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Protected
+	#tag EndConstant
+
 	#tag Constant, Name = Flag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
 	#tag EndConstant
 
@@ -173,7 +185,8 @@ Protected Module UnRAR
 		  UnpackedSize As UInt32
 		  HostOS As UInt32
 		  FileCRC As UInt32
-		  FileTime As UInt32
+		  FileTime As UInt16
+		  FileDate As UInt16
 		  UnpVer As UInt32
 		  Method As UInt32
 		  FileAttr As UInt32

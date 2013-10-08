@@ -11,7 +11,7 @@ Protected Class RARchive
 		    data.AchiveName = path
 		    data.OpenMode = RAR_OM_EXTRACT
 		    mHandle = UnRAR.RAROpenArchive(data)
-		    If mHandle > 0 Then 
+		    If mHandle > 0 Then
 		      CloseArchive(mHandle)
 		      Return data
 		    End If
@@ -40,12 +40,11 @@ Protected Class RARchive
 		  data.Comments = mb
 		  mHandle = UnRAR.RAROpenArchive(data)
 		  If mHandle <= 0 Then
-		    Dim err As New RuntimeException
-		    err.ErrorNumber = data.OpenResult
-		    err.Message = UnRAR.FormatError(err.ErrorNumber)
-		    Raise err
+		    mLastError = data.OpenResult
+		    CloseArchive(mHandle)
+		    Return ""
 		  End If
-		  Call UnRAR.RARCloseArchive(mHandle)
+		  CloseArchive(mHandle)
 		  Dim comment As MemoryBlock = data.Comments
 		  Return comment.StringValue(0, data.CommentSize)
 		End Function
@@ -53,7 +52,11 @@ Protected Class RARchive
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem)
-		  mRARFile = RARFile
+		  If UnRAR.IsRARArchive(RARFile) Then
+		    mRARFile = RARFile
+		  Else
+		    mLastError = UnRAR.ErrorBadArchive
+		  End If
 		  
 		End Sub
 	#tag EndMethod
@@ -66,8 +69,10 @@ Protected Class RARchive
 		    Dim count As Integer
 		    While True
 		      Dim header As RARHeaderData
-		      If UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil) <> 0 Then Exit While
-		      If UnRAR.RARReadHeader(mHandle, header) <> 0 Then Exit While
+		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		      If mLastError <> 0 Then Exit While
+		      mLastError = UnRAR.RARReadHeader(mHandle, header)
+		      If mLastError <> 0 Then Exit While
 		      count = count + 1
 		    Wend
 		    CloseArchive(mHandle)
@@ -88,16 +93,14 @@ Protected Class RARchive
 		    Dim dir As MemoryBlock = OutputDirectory.AbsolutePath + Chr(0) + Chr(0)
 		    While True
 		      Dim h As RARHeaderData
-		      If UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, dir, Nil) <> 0 Then
-		        success = False
-		        Exit While
+		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, dir, Nil)
+		      success = (mLastError = 0)
+		      If Not success Then Exit While
+		      mLastError = UnRAR.RARReadHeader(mHandle, h)
+		      If h.FileName.Trim <> "" Then
+		        success = True
 		      Else
-		        Call UnRAR.RARReadHeader(mHandle, h)
-		        If h.FileName.Trim <> "" Then
-		          success = True
-		        Else
-		          Exit While
-		        End If
+		        Exit While
 		      End If
 		    Wend
 		    CloseArchive(mHandle)
@@ -150,7 +153,7 @@ Protected Class RARchive
 
 	#tag Method, Flags = &h0
 		Function Item(Index As Integer) As RARItem
-		  ' Retrieves the header for a single item 
+		  ' Retrieves the header for a single item
 		  Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		  Dim header As RARHeaderData
 		  Dim i As Integer
@@ -165,6 +168,12 @@ Protected Class RARchive
 		      Return New RARItem(header, i)
 		    End If
 		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function LastError() As Integer
+		  
 		End Function
 	#tag EndMethod
 
@@ -244,6 +253,10 @@ Protected Class RARchive
 		End Function
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h1
+		Protected mLastError As Integer
+	#tag EndProperty
 
 	#tag Property, Flags = &h21
 		Private mRARFile As FolderItem
