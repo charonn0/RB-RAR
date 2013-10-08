@@ -30,29 +30,37 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Open()
-		  Dim f As FolderItem = GetOpenFolderItem("")
-		  Dim r As RARchive = RARchive.Open(f)
-		  'Dim i As Integer = r.ItemCount
-		  Dim ri As RARItem = r.Item(1)
-		  Dim a, c, n, os As String
-		  Dim ver As Double
-		  Dim cry, sol As Boolean
-		  Dim CR, att, fl, pkd, upkd, m As Integer
-		  a = ri.ArchiveName
-		  c = ri.Comment
-		  cr = ri.CRC32
-		  cry = ri.Encrypted
-		  att = ri.FileAttributes
-		  n = ri.FileName
-		  fl = ri.Flags
-		  os = ri.HostOS
-		  sol = ri.IsSolid
-		  ver = ri.MinimumVersion
-		  pkd = ri.PackedSize
-		  m = ri.PackingMethod
-		  upkd = ri.UnpackedSize
-		  Call r.ExtractItem(1, SpecialFolder.Desktop.Child(ri.FileName))
-		  Break
+		  Dim r As New UnRar.RARchive(GetOpenFolderItem(""))
+		  'Call r.ExtractAll(SpecialFolder.Desktop.Child("Output"))
+		  'Dim g As FolderItem = r.ExtractItem(3)
+		  'g.MoveFileTo(SpecialFolder.Desktop)
+		  'If r.TestAll Then
+		  'Break
+		  'Else
+		  'Break
+		  'End If
+		  Dim count As Integer = r.Count
+		  For i As Integer = 1 To count
+		    Dim ri As UnRAR.RARItem = r.Item(i)
+		    Dim a, c, n, os As String
+		    Dim ver As Double
+		    Dim cry, sol As Boolean
+		    Dim CR, att, fl, pkd, upkd, m As Integer
+		    a = ri.Archive.AbsolutePath
+		    c = ri.Comment
+		    cr = ri.CRC32
+		    cry = ri.IsEncrypted
+		    att = ri.FileAttributes
+		    n = ri.FileName
+		    fl = ri.Flags
+		    os = ri.HostOS
+		    sol = ri.IsSolid
+		    ver = ri.MinimumVersion
+		    pkd = ri.PackedSize
+		    m = ri.PackingMethod
+		    upkd = ri.UnpackedSize
+		    Break
+		  Next
 		End Sub
 	#tag EndEvent
 

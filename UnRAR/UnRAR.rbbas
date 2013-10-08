@@ -1,7 +1,7 @@
 #tag Module
 Protected Module UnRAR
-	#tag Method, Flags = &h0
-		Function FormatError(RARErrorNumber As Integer) As String
+	#tag Method, Flags = &h1
+		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
 		  Case ErrorBadArchive
 		    Return "Volume is not valid RAR archive"
@@ -34,6 +34,12 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Function IsAvailable() As Boolean
+		  Return System.IsFunctionAvailable("RARProcessFile", "UnRAR")
+		End Function
+	#tag EndMethod
+
 	#tag ExternalMethod, Flags = &h0
 		Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
 	#tag EndExternalMethod
@@ -61,6 +67,14 @@ Protected Module UnRAR
 	#tag ExternalMethod, Flags = &h0
 		Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
 	#tag EndExternalMethod
+
+	#tag Method, Flags = &h1
+		Protected Function Version() As Integer
+		  If UnRAR.IsAvailable Then
+		    Return RARGetDllVersion()
+		  End If
+		End Function
+	#tag EndMethod
 
 
 	#tag Constant, Name = ErrorBadArchive, Type = Double, Dynamic = False, Default = \"13", Scope = Protected
@@ -102,7 +116,19 @@ Protected Module UnRAR
 	#tag Constant, Name = ErrorUnknownFormat, Type = Double, Dynamic = False, Default = \"14", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = OpTest, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
+	#tag Constant, Name = Flag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = Flag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = Flag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = Flag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = Flag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
 	#tag EndConstant
 
 	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Protected
@@ -139,7 +165,7 @@ Protected Module UnRAR
 	#tag EndConstant
 
 
-	#tag Structure, Name = RARHeaderData, Flags = &h0
+	#tag Structure, Name = RARHeaderData, Flags = &h1
 		ArchiveName As String*260
 		  FileName As String*260
 		  Flags As UInt32
@@ -157,7 +183,7 @@ Protected Module UnRAR
 		CommentState As UInt32
 	#tag EndStructure
 
-	#tag Structure, Name = RAROpenArchiveData, Flags = &h0
+	#tag Structure, Name = RAROpenArchiveData, Flags = &h1
 		AchiveName As Ptr
 		  OpenMode As UInt32
 		  OpenResult As UInt32

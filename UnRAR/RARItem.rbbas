@@ -1,8 +1,8 @@
 #tag Class
-Class RARItem
+Protected Class RARItem
 	#tag Method, Flags = &h0
-		Function ArchiveName() As String
-		  Return RawData.ArchiveName
+		Function Archive() As FolderItem
+		  Return GetFolderItem(RawData.ArchiveName)
 		End Function
 	#tag EndMethod
 
@@ -29,8 +29,8 @@ Class RARItem
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function Encrypted() As Boolean
-		  Return BitAnd(Me.Flags, Flag_Encrypted) = Flag_Encrypted
+		Function Directory() As Boolean
+		  Return BitAnd(Me.Flags, &h0000111) = &h0000111
 		End Function
 	#tag EndMethod
 
@@ -82,6 +82,12 @@ Class RARItem
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function IsEncrypted() As Boolean
+		  Return BitAnd(Me.Flags, Flag_Encrypted) = Flag_Encrypted
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function IsSolid() As Boolean
 		  Return BitAnd(Me.Flags, Flag_Solid) = Flag_Solid
 		End Function
@@ -119,22 +125,6 @@ Class RARItem
 	#tag Property, Flags = &h1
 		Protected RawData As RARHeaderData
 	#tag EndProperty
-
-
-	#tag Constant, Name = Flag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = Flag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = Flag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = Flag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = Flag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
-	#tag EndConstant
 
 
 	#tag ViewBehavior
