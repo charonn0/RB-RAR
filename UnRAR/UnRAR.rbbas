@@ -53,6 +53,10 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
+	#tag DelegateDeclaration, Flags = &h1
+		Protected Delegate Function RARCallback(msg As UInt32, UserData As Ptr, P1 As Ptr, P2 As Ptr) As Integer
+	#tag EndDelegateDeclaration
+
 	#tag ExternalMethod, Flags = &h1
 		Protected Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
 	#tag EndExternalMethod
@@ -66,7 +70,15 @@ Protected Module UnRAR
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RAROpenArchiveEx Lib "UnRAR" (ByRef Data As RAROpenArchiveDataEx) As Integer
+	#tag EndExternalMethod
+
+	#tag ExternalMethod, Flags = &h1
 		Protected Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
+	#tag EndExternalMethod
+
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RARProcessFileW Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h1
@@ -74,7 +86,7 @@ Protected Module UnRAR
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Sub RARSetCallback Lib "UnRAR" (Handle As Integer, Callback As Ptr)
+		Protected Soft Declare Function RARReadHeaderEx Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderDataEx) As Integer
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h1
@@ -147,6 +159,24 @@ Protected Module UnRAR
 	#tag Constant, Name = Flag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
 	#tag EndConstant
 
+	#tag Constant, Name = MethodBest, Type = Double, Dynamic = False, Default = \"&h35", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = MethodFast, Type = Double, Dynamic = False, Default = \"&h32", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = MethodFastest, Type = Double, Dynamic = False, Default = \"&h31", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = MethodGood, Type = Double, Dynamic = False, Default = \"&h34", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = MethodNormal, Type = Double, Dynamic = False, Default = \"&h33", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = MethodStore, Type = Double, Dynamic = False, Default = \"&h30", Scope = Protected
+	#tag EndConstant
+
 	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Protected
 	#tag EndConstant
 
@@ -200,6 +230,31 @@ Protected Module UnRAR
 		CommentState As UInt32
 	#tag EndStructure
 
+	#tag Structure, Name = RARHeaderDataEx, Flags = &h1
+		ArchiveName As String*1024
+		  ArchiveNameW As String*1024
+		  FileName As String*1024
+		  FileNameW As String*1024
+		  Flags As UInt32
+		  PackedSize As UInt32
+		  UnpackedSize As UInt32
+		  HostOS As UInt32
+		  FileCRC As UInt32
+		  FileTime As UInt16
+		  FileDate As UInt16
+		  UnpVer As UInt32
+		  Method As UInt32
+		  FileAttr As UInt32
+		  CommentBuffer As Ptr
+		  CommentBufferSize As UInt32
+		  CommentSize As UInt32
+		  CommentState As UInt32
+		  DictSize As UInt32
+		  HashType As UInt32
+		  Hash As String*32
+		Reserved As String*1014
+	#tag EndStructure
+
 	#tag Structure, Name = RAROpenArchiveData, Flags = &h1
 		AchiveName As Ptr
 		  OpenMode As UInt32
@@ -208,6 +263,21 @@ Protected Module UnRAR
 		  CommentBufferSize As UInt32
 		  CommentSize As UInt32
 		CommentState As UInt32
+	#tag EndStructure
+
+	#tag Structure, Name = RAROpenArchiveDataEx, Flags = &h1
+		AchiveName As Ptr
+		  ArchiveNameW As Ptr
+		  OpenMode As UInt32
+		  OpenResult As UInt32
+		  Comments As Ptr
+		  CommentBufferSize As UInt32
+		  CommentSize As UInt32
+		  CommentState As UInt32
+		  Flags As UInt32
+		  Callback As Ptr
+		  UserData As Ptr
+		Reserved As Ptr
 	#tag EndStructure
 
 
