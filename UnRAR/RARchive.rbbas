@@ -1,24 +1,5 @@
 #tag Class
-Protected Class RARchive
-	#tag Method, Flags = &h1
-		Protected Shared Function ArchiveHeader(RARFile As FolderItem) As RAROpenArchiveData
-		  ' Retrieves the header for the entire archive
-		  If UnRAR.IsAvailable Then
-		    Dim mHandle As Integer
-		    Dim data As RAROpenArchiveData
-		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
-		    path.CString(0) = RARFile.AbsolutePath
-		    data.AchiveName = path
-		    data.OpenMode = RAR_OM_EXTRACT
-		    mHandle = UnRAR.RAROpenArchive(data)
-		    If mHandle > 0 Then
-		      CloseArchive(mHandle)
-		      Return data
-		    End If
-		  End If
-		End Function
-	#tag EndMethod
-
+Class RARchive
 	#tag Method, Flags = &h1
 		Protected Shared Sub CloseArchive(RARHandle As Integer)
 		  If UnRAR.IsAvailable Then
@@ -52,11 +33,7 @@ Protected Class RARchive
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem)
-		  If UnRAR.IsRARArchive(RARFile) Then
-		    mRARFile = RARFile
-		  Else
-		    mLastError = UnRAR.ErrorBadArchive
-		  End If
+		  mRARFile = RARFile
 		  
 		End Sub
 	#tag EndMethod
@@ -82,7 +59,7 @@ Protected Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ExtractAll(OutputDirectory As FolderItem) As Boolean
+		Function ExtractAll(OutputDirectory As FolderItem, Password As String = "") As Boolean
 		  ' extracts the entire archive to the specified output folder
 		  If UnRAR.IsAvailable Then
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
@@ -91,18 +68,15 @@ Protected Class RARchive
 		      UnRAR.RARSetPassword(mHandle, Password)
 		    End If
 		    Dim dir As MemoryBlock = OutputDirectory.AbsolutePath + Chr(0) + Chr(0)
-		    While True
+		    mLastError = 0
+		    Do Until Me.LastError <> 0
 		      Dim h As RARHeaderData
 		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, dir, Nil)
 		      success = (mLastError = 0)
-		      If Not success Then Exit While
+		      If Not success Then Continue
 		      mLastError = UnRAR.RARReadHeader(mHandle, h)
-		      If h.FileName.Trim <> "" Then
-		        success = True
-		      Else
-		        Exit While
-		      End If
-		    Wend
+		      If h.FileName.Trim <> "" Then success = True
+		    Loop
 		    CloseArchive(mHandle)
 		    Return success
 		  End If
@@ -110,41 +84,32 @@ Protected Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ExtractItem(Index As Integer) As FolderItem
+		Function ExtractItem(Index As Integer, Password As String = "") As FolderItem
 		  ' extracts the archived file at Index to a Temporary file
 		  If UnRAR.IsAvailable Then
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    If Password <> "" Then
-		      UnRAR.RARSetPassword(mHandle, Password)
-		    End If
+		    If Password <> "" Then UnRAR.RARSetPassword(mHandle, Password)
 		    Dim outputfile As FolderItem
 		    Dim i As Integer
-		    While True
+		    mLastError = 0
+		    Do Until Me.LastError <> 0 Or i > Index
 		      Dim h As RARHeaderData
 		      If i < Index Then
-		        If UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil) <> 0 Then
-		          outputfile = Nil
-		          Exit While
-		        End If
+		        mLastError = UnRAR.RARReadHeader(mHandle, h)
+		        If Me.LastError = 0 Then mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      ElseIf i = Index Then
-		        Call UnRAR.RARReadHeader(mHandle, h)
-		        If h.FileName.Trim <> "" Then
-		          outputfile = SpecialFolder.Temporary.Child(h.FileName)
+		        mLastError = UnRAR.RARReadHeader(mHandle, h)
+		        If mLastError = 0 And h.FileName.Trim <> "" Then
+		          Dim item As New RARItem(h, i)
+		          outputfile = SpecialFolder.Temporary.Child(NthField(h.FileName, "\", CountFields(h.FileName, "\")))
 		          Dim bs As BinaryStream = BinaryStream.Create(outputfile, True)
 		          bs.Close
+		          Dim file As MemoryBlock = outputfile.AbsolutePath + Chr(0) + Chr(0)
+		          mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, Nil, file)
 		        End If
-		        Dim file As MemoryBlock = outputfile.AbsolutePath + Chr(0) + Chr(0)
-		        If UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, Nil, file) <> 0 Then
-		          outputfile = Nil
-		          Exit While
-		        Else
-		          Exit While
-		        End If
-		      Else
-		        Exit While
 		      End If
 		      i = i + 1
-		    Wend
+		    Loop
 		    CloseArchive(mHandle)
 		    Return outputfile
 		  End If
@@ -173,7 +138,7 @@ Protected Class RARchive
 
 	#tag Method, Flags = &h0
 		Function LastError() As Integer
-		  
+		  Return mLastError
 		End Function
 	#tag EndMethod
 
@@ -182,14 +147,23 @@ Protected Class RARchive
 		  If UnRAR.IsAvailable Then
 		    Dim mHandle As Integer
 		    Dim data As RAROpenArchiveData
+		    Dim mb As New MemoryBlock(260 * 2)
 		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
 		    path.CString(0) = RARFile.AbsolutePath
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
 		    data.AchiveName = path
 		    data.OpenMode = mode
 		    mHandle = UnRAR.RAROpenArchive(data)
 		    If mHandle <= 0 Then Return 0
 		    Return mHandle
 		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function RARFile() As FolderItem
+		  Return mRARFile
 		End Function
 	#tag EndMethod
 
@@ -254,31 +228,36 @@ Protected Class RARchive
 	#tag EndMethod
 
 
+	#tag Note, Name = About this class
+		This class represents a RAR archive. Pass the RAR as a FolderItem to the class constructor. To access
+		files inside the archive call the ExtractAll or ExtractItem methods. 
+		
+		To retreive metadata for a particular item, call the Item method. The Item method returns a RARItem 
+		for the archived file at the specified Index.
+		
+		To test a single file in the archive, call TestItem; to test all files, call TestAll.
+		
+		Indices passed to Item, ExtractItem, and TestItem are zero-based: they run from 0 to RARchive.Count-1.
+		
+		The Comment method returns the archive comment, if any.
+		
+		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
+		instance can have the archive open (for extraction, testing, or counting) at any given moment.
+		
+		Avoid unneccessary calls to RARchive.Count as each call must enumerate the contents of the entire archive. Similarly,
+		the execution time of RARchive.Item rises in direct proportion to the Index of the file being retrieved. Patterns
+		and optimizations appropriate for enumerating a directory via the FolderItem class are equally appropriate for 
+		RARchives.
+	#tag EndNote
+
+
 	#tag Property, Flags = &h1
 		Protected mLastError As Integer
 	#tag EndProperty
 
-	#tag Property, Flags = &h21
-		Private mRARFile As FolderItem
+	#tag Property, Flags = &h1
+		Protected mRARFile As FolderItem
 	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		Password As String
-	#tag EndProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  return mRARFile
-			End Get
-		#tag EndGetter
-		#tag Setter
-			Set
-			  mRARFile = value
-			End Set
-		#tag EndSetter
-		RARFile As FolderItem
-	#tag EndComputedProperty
 
 
 	#tag ViewBehavior

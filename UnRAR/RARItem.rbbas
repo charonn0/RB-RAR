@@ -1,5 +1,5 @@
 #tag Class
-Protected Class RARItem
+Class RARItem
 	#tag Method, Flags = &h0
 		Sub Constructor(Data As RARHeaderData, Index As Integer)
 		  RawData = Data
@@ -185,6 +185,31 @@ Protected Class RARItem
 
 	#tag ViewBehavior
 		#tag ViewProperty
+			Name="Comment"
+			Group="Behavior"
+			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="CRC32"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Directory"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="FileName"
+			Group="Behavior"
+			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="HostOS"
+			Group="Behavior"
+			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Index"
 			Visible=true
 			Group="ID"
@@ -192,11 +217,26 @@ Protected Class RARItem
 			InheritedFrom="Object"
 		#tag EndViewProperty
 		#tag ViewProperty
+			Name="IsEncrypted"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="IsSolid"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="Left"
 			Visible=true
 			Group="Position"
 			InitialValue="0"
 			InheritedFrom="Object"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="MinimumVersion"
+			Group="Behavior"
+			Type="Double"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Name"

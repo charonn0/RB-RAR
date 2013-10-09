@@ -40,41 +40,45 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Function IsRARArchive(Arch As FolderItem) As Boolean
+	#tag Method, Flags = &h0
+		Function IsRARArchive(Extends Arch As FolderItem) As Boolean
 		  Dim bs As BinaryStream = BinaryStream.Open(Arch)
 		  Dim israr As Boolean = (bs.Read(4) = "Rar!")
 		  bs.Close
 		  Return israr
+		  
+		Exception err
+		  If err IsA ThreadEndException Or err IsA EndException Then Raise err
+		  Return False
 		End Function
 	#tag EndMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Function RARGetDllVersion Lib "UnRAR" () As Integer
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RARGetDllVersion Lib "UnRAR" () As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Function RAROpenArchive Lib "UnRAR" (ByRef Data As RAROpenArchiveData) As Integer
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RAROpenArchive Lib "UnRAR" (ByRef Data As RAROpenArchiveData) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Function RARReadHeader Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderData) As Integer
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Function RARReadHeader Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderData) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Sub RARSetCallback Lib "UnRAR" (Handle As Integer, Callback As Ptr)
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Sub RARSetCallback Lib "UnRAR" (Handle As Integer, Callback As Ptr)
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h0
-		Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
+	#tag ExternalMethod, Flags = &h1
+		Protected Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
 	#tag EndExternalMethod
 
 	#tag Method, Flags = &h1
