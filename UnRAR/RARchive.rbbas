@@ -42,6 +42,7 @@ Class RARchive
 		Function Count() As Integer
 		  ' Returns the number of items in the archive
 		  If UnRAR.IsAvailable Then
+		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
 		    Dim count As Integer
 		    While True
@@ -85,33 +86,36 @@ Class RARchive
 
 	#tag Method, Flags = &h0
 		Function ExtractItem(Index As Integer, Password As String = "") As FolderItem
-		  ' extracts the archived file at Index to a Temporary file
+		  ' extracts the archived file at Index to a Temporary file, or Nil on error.
 		  If UnRAR.IsAvailable Then
-		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    If Password <> "" Then UnRAR.RARSetPassword(mHandle, Password)
-		    Dim outputfile As FolderItem
-		    Dim i As Integer
 		    mLastError = 0
-		    Do Until Me.LastError <> 0 Or i > Index
-		      Dim h As RARHeaderData
-		      If i < Index Then
-		        mLastError = UnRAR.RARReadHeader(mHandle, h)
-		        If Me.LastError = 0 Then mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
-		      ElseIf i = Index Then
-		        mLastError = UnRAR.RARReadHeader(mHandle, h)
-		        If mLastError = 0 And h.FileName.Trim <> "" Then
-		          Dim item As New RARItem(h, i)
-		          outputfile = SpecialFolder.Temporary.Child(NthField(h.FileName, "\", CountFields(h.FileName, "\")))
-		          Dim bs As BinaryStream = BinaryStream.Create(outputfile, True)
-		          bs.Close
-		          Dim file As MemoryBlock = outputfile.AbsolutePath + Chr(0) + Chr(0)
-		          mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, Nil, file)
+		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If mhandle <= 0 Then
+		      mLastError = mhandle * -1
+		      Return Nil
+		    End If
+		    Dim savedto As FolderItem
+		    Dim i As Integer
+		    Do Until Me.LastError <> 0
+		      Dim header As RARHeaderData
+		      mLastError = UnRAR.RARReadHeader(mHandle, header)
+		      Dim head As New RARItem(header, i)
+		      If i = Index Then
+		        If mLastError = 0 Then 
+		          savedto = SpecialFolder.Temporary.Child(NthField(header.FileName, "\", CountFields(header.FileName, "\")))
+		          Dim path As New MemoryBlock(savedto.AbsolutePath.LenB * 2)
+		          path.CString(0) = savedto.AbsolutePath + Chr(0)
+		          mLastError = RARProcessFile(mHandle, RAR_EXTRACT, Nil, path)
+		          If mLastError <> 0 Then savedto = Nil
+		          Exit Do
 		        End If
+		      Else
+		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    Return outputfile
+		    Return savedto
 		  End If
 		End Function
 	#tag EndMethod
@@ -201,26 +205,15 @@ Class RARchive
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		    Dim success As Boolean
 		    Dim i As Integer
-		    While True
+		    Do Until Me.LastError <> 0
 		      If i = Index Then
-		        If RARProcessFile(mHandle, RAR_TEST, Nil, Nil) <> 0 Then
-		          success = False
-		        Else
-		          success = True
-		        End If
-		        Exit While
-		      ElseIf i < Index Then
-		        If RARProcessFile(mHandle, RAR_SKIP, Nil, Nil) <> 0 Then
-		          success = False
-		          Exit While
-		        Else
-		          success = True
-		        End If
+		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
 		      Else
-		        Exit While
+		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
+		      success = (Me.LastError = 0)
 		      i = i + 1
-		    Wend
+		    Loop
 		    CloseArchive(mHandle)
 		    Return success
 		  End If
@@ -280,12 +273,6 @@ Class RARchive
 			Visible=true
 			Group="ID"
 			InheritedFrom="Object"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="Password"
-			Group="Behavior"
-			Type="String"
-			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Super"
