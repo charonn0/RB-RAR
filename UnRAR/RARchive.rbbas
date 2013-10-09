@@ -54,6 +54,7 @@ Class RARchive
 		      count = count + 1
 		    Wend
 		    CloseArchive(mHandle)
+		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return count
 		  End If
 		End Function
@@ -63,13 +64,13 @@ Class RARchive
 		Function ExtractAll(OutputDirectory As FolderItem, Password As String = "") As Boolean
 		  ' extracts the entire archive to the specified output folder
 		  If UnRAR.IsAvailable Then
-		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    Dim success As Boolean
-		    If Password <> "" Then
-		      UnRAR.RARSetPassword(mHandle, Password)
-		    End If
-		    Dim dir As MemoryBlock = OutputDirectory.AbsolutePath + Chr(0) + Chr(0)
 		    mLastError = 0
+		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If mhandle <= 0 Then mLastError = mhandle * -1
+		    Dim success As Boolean
+		    If Password <> "" Then RARSetPassword(mHandle, Password)
+		    Dim dir As MemoryBlock = OutputDirectory.AbsolutePath + Chr(0) + Chr(0)
+		    
 		    Do Until Me.LastError <> 0
 		      Dim h As RARHeaderData
 		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, dir, Nil)
@@ -90,19 +91,17 @@ Class RARchive
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    If mhandle <= 0 Then
-		      mLastError = mhandle * -1
-		      Return Nil
-		    End If
+		    If mhandle <= 0 Then mLastError = mhandle * -1
+		    If Password <> "" Then RARSetPassword(mHandle, Password)
 		    Dim savedto As FolderItem
 		    Dim i As Integer
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
-		      mLastError = UnRAR.RARReadHeader(mHandle, header)
-		      Dim head As New RARItem(header, i)
+		      mLastError = RARReadHeader(mHandle, header)
 		      If i = Index Then
 		        If mLastError = 0 Then 
-		          savedto = SpecialFolder.Temporary.Child(NthField(header.FileName, "\", CountFields(header.FileName, "\")))
+		          Dim head As New RARItem(header, i)
+		          savedto = SpecialFolder.Temporary.Child(NthField(head.FileName, "\", CountFields(head.FileName, "\")))
 		          Dim path As New MemoryBlock(savedto.AbsolutePath.LenB * 2)
 		          path.CString(0) = savedto.AbsolutePath + Chr(0)
 		          mLastError = RARProcessFile(mHandle, RAR_EXTRACT, Nil, path)
@@ -125,17 +124,21 @@ Class RARchive
 		  ' Retrieves the header for a single item
 		  Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		  Dim header As RARHeaderData
+		  Dim ritem As RARItem
 		  Dim i As Integer
 		  If UnRAR.IsAvailable Then
-		    While True
-		      If UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil) <> 0 Then Exit While
-		      If UnRAR.RARReadHeader(mHandle, header)<> 0 Or Index = i Then Exit While
+		    Do Until Me.LastError <> 0
+		      mLastError = RARReadHeader(mHandle, header)
+		      If Index = i Then 
+		        ritem = New RARItem(header, i)
+		        Exit Do
+		      Else
+		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		      End If
 		      i = i + 1
-		    Wend
+		    Loop
 		    CloseArchive(mHandle)
-		    If i = Index Then
-		      Return New RARItem(header, i)
-		    End If
+		    Return ritem
 		  End If
 		End Function
 	#tag EndMethod
@@ -159,7 +162,7 @@ Class RARchive
 		    data.AchiveName = path
 		    data.OpenMode = mode
 		    mHandle = UnRAR.RAROpenArchive(data)
-		    If mHandle <= 0 Then Return 0
+		    If mHandle <= 0 Then Return data.OpenResult * -1
 		    Return mHandle
 		  End If
 		End Function
@@ -172,26 +175,24 @@ Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TestAll() As Boolean
+		Function TestAll(Password As String = "") As Boolean
 		  ' tests all items in the archive
+		  ' tests a single item in the archive
 		  If UnRAR.IsAvailable Then
 		    Dim i, count As Integer
 		    count = Me.Count
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If Password <> "" Then RARSetPassword(mHandle, Password)
 		    Dim success As Boolean
-		    While True
-		      If i <= Count Then
-		        If RARProcessFile(mHandle, RAR_TEST, Nil, Nil) <> 0 Then
-		          success = False
-		          Exit While
-		        Else
-		          success = True
-		        End If
+		    Do Until Me.LastError <> 0
+		      If i > count Then
+		        Exit Do
 		      Else
-		        Exit While
+		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
 		      End If
+		      success = (Me.LastError = 0)
 		      i = i + 1
-		    Wend
+		    Loop
 		    CloseArchive(mHandle)
 		    Return success
 		  End If
@@ -199,15 +200,17 @@ Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function TestItem(Index As Integer) As Boolean
+		Function TestItem(Index As Integer, Password As String = "") As Boolean
 		  ' tests a single item in the archive
 		  If UnRAR.IsAvailable Then
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If Password <> "" Then RARSetPassword(mHandle, Password)
 		    Dim success As Boolean
 		    Dim i As Integer
 		    Do Until Me.LastError <> 0
 		      If i = Index Then
 		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
+		        Exit Do
 		      Else
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
