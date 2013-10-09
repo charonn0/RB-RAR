@@ -362,9 +362,12 @@ End
 		  'Call ri.FileTime
 		  'Break
 		  'Next
-		  Dim i As Integer = r.Count
-		  Dim f As FolderItem = r.ExtractItem(1)
-		  f.MoveFileTo(SpecialFolder.Desktop)
+		  'Dim i As Integer = r.Count
+		  Call r.TestAll
+		  'Call r.TestItem(2)
+		  'Call r.ExtractAll(SelectFolder)
+		  'Dim f As FolderItem = r.ExtractItem(4)
+		  'f.MoveFileTo(SpecialFolder.Desktop)
 		  Quit
 		End Sub
 	#tag EndEvent
