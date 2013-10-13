@@ -105,81 +105,22 @@ Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
-		Protected Shared Function OpenArchive(RARFile As FolderItem, Mode As Integer, ExtendedMode As Boolean = False) As Integer
+		Protected Shared Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
 		  If UnRAR.IsAvailable Then
 		    Dim mHandle, err As Integer
 		    Dim mb As New MemoryBlock(260 * 2)
 		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
 		    path.CString(0) = RARFile.AbsolutePath
-		    If Not ExtendedMode Then
-		      Dim data As RAROpenArchiveData
-		      data.CommentBufferSize = mb.Size
-		      data.Comments = mb
-		      data.AchiveName = path
-		      data.OpenMode = mode
-		      mHandle = UnRAR.RAROpenArchive(data)
-		      err = data.OpenResult
-		    Else
-		      Dim data As RAROpenArchiveDataEx
-		      data.CommentBufferSize = mb.Size
-		      data.Comments = mb
-		      data.AchiveName = path
-		      data.OpenMode = mode
-		      data.Callback = AddressOf RARCallbackHandler
-		      data.UserData = path
-		      mHandle = RAROpenArchiveEx(data)
-		      err = data.OpenResult
-		    End If
+		    Dim data As RAROpenArchiveData
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
+		    data.AchiveName = path
+		    data.OpenMode = mode
+		    mHandle = UnRAR.RAROpenArchive(data)
+		    err = data.OpenResult
 		    If mHandle <= 0 Then Return err * -1
 		    Return mHandle
 		  End If
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Shared Function RARCallbackHandler(msg As UInt32, UserData As Ptr, P1 As Ptr, P2 As Ptr) As Integer
-		  Dim s As String = UserData.CString(0)
-		  If ExArchives.HasKey(s) Then
-		    Dim a As RARchive = ExArchives.Value(s)
-		    Return a.RAREventHandler(msg, P1, P2)
-		  End If
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function RAREventHandler(msg As UInt32, P1 As Ptr, P2 As Ptr) As Integer
-		  Select Case msg
-		  Case UCM_CHANGEVOLUME
-		    If P2.UInt32(0) = RAR_VOL_ASK Then
-		      Dim path As String = P1.CString(0)
-		      Dim f As FolderItem = GetFolderItem(path)
-		      If RaiseEvent ChangeVolume(f) Then
-		        P1.CString(0) = f.AbsolutePath + Chr(0)
-		        Return 1
-		      End If
-		    ElseIf P2.UInt32(0) = RAR_VOL_NOTIFY Then
-		      Return 1
-		    End If
-		    
-		  Case UCM_PROCESSDATA
-		    Dim mb As MemoryBlock = P1.CString(0)
-		    Dim bs As New BinaryStream(mb)
-		    If RaiseEvent ProcessData(bs, bs.Length) Then
-		      Return 1
-		    End If
-		    
-		  Case UCM_NEEDPASSWORD
-		    Dim pw As String = RaiseEvent PasswordPrompt()
-		    If pw.Trim <> "" Then
-		      pw = ConvertEncoding(pw, Encodings.ASCII)
-		      P1.CString(0) = pw + Chr(0)
-		      P2.UInt32(0) = pw.Len
-		      Return 1
-		    End If
-		    
-		  End Select
-		  
-		  Return -1
 		End Function
 	#tag EndMethod
 
@@ -237,19 +178,6 @@ Class RARchive
 		  End If
 		End Function
 	#tag EndMethod
-
-
-	#tag Hook, Flags = &h0
-		Event ChangeVolume(ByRef NextVolume As FolderItem) As Boolean
-	#tag EndHook
-
-	#tag Hook, Flags = &h0
-		Event PasswordPrompt() As String
-	#tag EndHook
-
-	#tag Hook, Flags = &h0
-		Event ProcessData(Data As Readable, Length As Integer) As Boolean
-	#tag EndHook
 
 
 	#tag Note, Name = About this class
@@ -326,21 +254,6 @@ Class RARchive
 		Count As Integer
 	#tag EndComputedProperty
 
-	#tag ComputedProperty, Flags = &h1
-		#tag Getter
-			Get
-			  Static mExArchives As Dictionary
-			  If mExArchives = Nil Then mExArchives = New Dictionary
-			  Return mExArchives
-			End Get
-		#tag EndGetter
-		Protected Shared ExArchives As Dictionary
-	#tag EndComputedProperty
-
-	#tag Property, Flags = &h0
-		ExtendedMode As Boolean
-	#tag EndProperty
-
 	#tag Property, Flags = &h1
 		Protected mLastError As Integer
 	#tag EndProperty
@@ -351,6 +264,21 @@ Class RARchive
 
 
 	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Comment"
+			Group="Behavior"
+			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Count"
+			Group="Behavior"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="ExtendedMode"
+			Group="Behavior"
+			Type="Boolean"
+		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
 			Visible=true
