@@ -347,28 +347,28 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Open()
-		  Dim r As New UnRar.RARchive(GetOpenFolderItem(""))
-		  'Call r.ExtractAll(SpecialFolder.Desktop.Child("Output"))
-		  'Dim g As FolderItem = r.ExtractItem(3)
-		  'g.MoveFileTo(SpecialFolder.Desktop)
-		  'If r.TestAll Then
-		  'Break
-		  'Else
-		  'Break
-		  'End If
-		  'Dim count As Integer = r.Count
-		  'For i As Integer = 1 To count
-		  'Dim ri As UnRAR.RARItem = r.Item(i)
-		  'Call ri.FileTime
-		  'Break
-		  'Next
-		  'Dim i As Integer = r.Count
-		  Call r.TestAll
-		  'Call r.TestItem(2)
-		  'Call r.ExtractAll(SelectFolder)
-		  'Dim f As FolderItem = r.ExtractItem(4)
-		  'f.MoveFileTo(SpecialFolder.Desktop)
-		  Quit
+		  'Dim r As New UnRar.RARchive(GetOpenFolderItem(""))
+		  ''Call r.ExtractAll(SpecialFolder.Desktop.Child("Output"))
+		  ''Dim g As FolderItem = r.ExtractItem(3)
+		  ''g.MoveFileTo(SpecialFolder.Desktop)
+		  ''If r.TestAll Then
+		  ''Break
+		  ''Else
+		  ''Break
+		  ''End If
+		  ''Dim count As Integer = r.Count
+		  ''For i As Integer = 1 To count
+		  ''Dim ri As UnRAR.RARItem = r.Item(i)
+		  ''Call ri.FileTime
+		  ''Break
+		  ''Next
+		  ''Dim i As Integer = r.Count
+		  'Call r.TestAll
+		  ''Call r.TestItem(2)
+		  ''Call r.ExtractAll(SelectFolder)
+		  ''Dim f As FolderItem = r.ExtractItem(4)
+		  ''f.MoveFileTo(SpecialFolder.Desktop)
+		  'Quit
 		End Sub
 	#tag EndEvent
 

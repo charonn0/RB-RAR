@@ -74,6 +74,27 @@ Class RARchive
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Shared Function GetArchiveInfo(RARFile As FolderItem) As RAROpenArchiveData
+		  If UnRAR.IsAvailable Then
+		    Dim mHandle, err As Integer
+		    Dim mb As New MemoryBlock(260 * 2)
+		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
+		    path.CString(0) = RARFile.AbsolutePath
+		    Dim data As RAROpenArchiveData
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
+		    data.AchiveName = path
+		    data.OpenMode = RAR_OM_EXTRACT
+		    mHandle = UnRAR.RAROpenArchive(data)
+		    err = data.OpenResult
+		    If mHandle <= 0 Then data.OpenResult = err * -1
+		    CloseArchive(mHandle)
+		    Return data
+		  End If
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function Item(Index As Integer) As RARItem
 		  ' Retrieves the header for a single item
@@ -268,16 +289,12 @@ Class RARchive
 			Name="Comment"
 			Group="Behavior"
 			Type="String"
+			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Count"
 			Group="Behavior"
 			Type="Integer"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="ExtendedMode"
-			Group="Behavior"
-			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"

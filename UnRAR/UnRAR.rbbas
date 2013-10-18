@@ -102,6 +102,33 @@ Protected Module UnRAR
 	#tag EndMethod
 
 
+	#tag Constant, Name = ArchiveFlag_AuthenticityInfo, Type = Double, Dynamic = False, Default = \"&h020", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_Comment, Type = Double, Dynamic = False, Default = \"&h002", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_EncryptedNames, Type = Double, Dynamic = False, Default = \"&h080", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_FirstVolume, Type = Double, Dynamic = False, Default = \"&h100", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_Locked, Type = Double, Dynamic = False, Default = \"&h004", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_NewNamingScheme, Type = Double, Dynamic = False, Default = \"&h010", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_RecoveryRecord, Type = Double, Dynamic = False, Default = \"&h040", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_Solid, Type = Double, Dynamic = False, Default = \"&h008", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ArchiveFlag_Volume, Type = Double, Dynamic = False, Default = \"&h001", Scope = Protected
+	#tag EndConstant
+
 	#tag Constant, Name = ErrorBadArchive, Type = Double, Dynamic = False, Default = \"13", Scope = Protected
 	#tag EndConstant
 
@@ -141,22 +168,22 @@ Protected Module UnRAR
 	#tag Constant, Name = ErrorUnknownFormat, Type = Double, Dynamic = False, Default = \"14", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Protected
+	#tag Constant, Name = ItemFlag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Protected
+	#tag Constant, Name = ItemFlag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
+	#tag Constant, Name = ItemFlag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Protected
+	#tag Constant, Name = ItemFlag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
+	#tag Constant, Name = ItemFlag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = Flag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
+	#tag Constant, Name = ItemFlag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
 	#tag EndConstant
 
 	#tag Constant, Name = MethodBest, Type = Double, Dynamic = False, Default = \"&h35", Scope = Protected

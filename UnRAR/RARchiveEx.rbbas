@@ -26,6 +26,7 @@ Inherits RARchive
 		  If UnRAR.IsAvailable Then
 		    mhandle = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
 		    If mhandle <= 0 Then mLastError = mhandle * -1
+		    ExArchives.Value(RARFile.AbsolutePath) = Me
 		    mIndex = 0
 		    Do Until LastError <> 0
 		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, Nil, Nil)
@@ -42,6 +43,7 @@ Inherits RARchive
 		  If UnRAR.IsAvailable Then
 		    mhandle = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
 		    If mhandle <= 0 Then mLastError = mhandle * -1
+		    ExArchives.Value(RARFile.AbsolutePath) = Me
 		    mIndex = 0
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderDataEx
@@ -62,13 +64,75 @@ Inherits RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Flags() As Integer
+		  Dim info As RAROpenArchiveDataEx = GetArchiveInfoEx(RARFile)
+		  Return info.Flags
+		  
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Shared Function GetArchiveInfoEx(RARFile As FolderItem) As RAROpenArchiveDataEx
+		  If UnRAR.IsAvailable Then
+		    Dim mHandle, err As Integer
+		    Dim mb As New MemoryBlock(260 * 2)
+		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
+		    path.CString(0) = RARFile.AbsolutePath
+		    Dim data As RAROpenArchiveDataEx
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
+		    data.AchiveName = path
+		    data.OpenMode = RAR_OM_EXTRACT
+		    data.Callback = AddressOf RARCallbackHandler
+		    data.UserData = path
+		    mHandle = RAROpenArchiveEx(data)
+		    If mHandle <= 0 Then data.OpenResult = err * -1
+		    CloseArchive(mHandle)
+		    Return data
+		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function HasAuthenticityInfo() As Boolean
+		  Return BitAnd(Me.Flags, ArchiveFlag_AuthenticityInfo) = ArchiveFlag_AuthenticityInfo
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function HasRecoveryRecord() As Boolean
+		  Return BitAnd(Me.Flags, ArchiveFlag_RecoveryRecord) = ArchiveFlag_RecoveryRecord
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function IsEncrypted() As Boolean
+		  Return BitAnd(Me.Flags, ArchiveFlag_EncryptedNames) = ArchiveFlag_EncryptedNames
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function IsLocked() As Boolean
+		  Return BitAnd(Me.Flags, ArchiveFlag_Locked) = ArchiveFlag_Locked
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function IsSolid() As Boolean
+		  Return BitAnd(Me.Flags, ArchiveFlag_Solid) = ArchiveFlag_Solid
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Item(Index As Integer)
 		  ' Retrieves the header for a single item
-		  Dim mhandle As Integer = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
-		  Dim header As RARHeaderDataEx
-		  Dim ritem As RARItemEx
-		  Dim i As Integer
 		  If UnRAR.IsAvailable Then
+		    Dim mhandle As Integer = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
+		    ExArchives.Value(RARFile.AbsolutePath) = Me
+		    Dim header As RARHeaderDataEx
+		    Dim ritem As RARItemEx
+		    Dim i As Integer
+		    
 		    Do Until Me.LastError <> 0
 		      mLastError = RARReadHeaderEx(mHandle, header)
 		      If Index = i Then
@@ -108,7 +172,9 @@ Inherits RARchive
 
 	#tag Method, Flags = &h21
 		Private Shared Function RARCallbackHandler(msg As UInt32, UserData As Ptr, P1 As Ptr, P2 As Ptr) As Integer
-		  Dim s As String = UserData.CString(0)
+		  #pragma X86CallingConvention StdCall
+		  Dim mb As MemoryBlock = UserData
+		  Dim s As String = mb.CString(0)
 		  If ExArchives.HasKey(s) Then
 		    Dim a As RARchiveEx = ExArchives.Value(s)
 		    Return a.RAREventHandler(msg, P1, P2)
@@ -162,6 +228,7 @@ Inherits RARchive
 		    Dim count As Integer
 		    count = Me.Count
 		    Dim mhandle As Integer = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
+		    ExArchives.Value(RARFile.AbsolutePath) = Me
 		    mIndex = 0
 		    Do Until Me.LastError <> 0
 		      If mIndex > count Then
@@ -181,6 +248,7 @@ Inherits RARchive
 		  ' tests a single item in the archive
 		  If UnRAR.IsAvailable Then
 		    Dim mhandle As Integer = OpenArchiveEx(RARFile, RAR_OM_EXTRACT)
+		    ExArchives.Value(RARFile.AbsolutePath) = Me
 		    mIndex = 0
 		    Do Until Me.LastError <> 0
 		      If mIndex = Index Then

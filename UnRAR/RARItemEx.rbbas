@@ -25,7 +25,7 @@ Inherits UnRAR.RARItem
 
 	#tag Method, Flags = &h0
 		Function Directory() As Boolean
-		  Return BitAnd(Me.Flags, Flag_Directory) = Flag_Directory
+		  Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
 		End Function
 	#tag EndMethod
 
@@ -83,13 +83,13 @@ Inherits UnRAR.RARItem
 
 	#tag Method, Flags = &h0
 		Function IsEncrypted() As Boolean
-		  Return BitAnd(Me.Flags, Flag_Encrypted) = Flag_Encrypted
+		  Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function IsSolid() As Boolean
-		  Return BitAnd(Me.Flags, Flag_Solid) = Flag_Solid
+		  Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
 		End Function
 	#tag EndMethod
 
@@ -117,11 +117,56 @@ Inherits UnRAR.RARItem
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function VolumeNumber() As Integer
+		  
+		End Function
+	#tag EndMethod
+
+
+	#tag Property, Flags = &h1
+		Protected mVolumeNumber As Integer = 1
+	#tag EndProperty
 
 	#tag Property, Flags = &h1
 		Protected RawDataEx As RARHeaderDataEx
 	#tag EndProperty
 
 
+	#tag ViewBehavior
+		#tag ViewProperty
+			Name="Index"
+			Visible=true
+			Group="ID"
+			InitialValue="-2147483648"
+			InheritedFrom="Object"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			InheritedFrom="Object"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Name"
+			Visible=true
+			Group="ID"
+			InheritedFrom="Object"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Super"
+			Visible=true
+			Group="ID"
+			InheritedFrom="Object"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Top"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			InheritedFrom="Object"
+		#tag EndViewProperty
+	#tag EndViewBehavior
 End Class
 #tag EndClass
