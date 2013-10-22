@@ -186,24 +186,6 @@ Protected Module UnRAR
 	#tag Constant, Name = ItemFlag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = MethodBest, Type = Double, Dynamic = False, Default = \"&h35", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = MethodFast, Type = Double, Dynamic = False, Default = \"&h32", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = MethodFastest, Type = Double, Dynamic = False, Default = \"&h31", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = MethodGood, Type = Double, Dynamic = False, Default = \"&h34", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = MethodNormal, Type = Double, Dynamic = False, Default = \"&h33", Scope = Protected
-	#tag EndConstant
-
-	#tag Constant, Name = MethodStore, Type = Double, Dynamic = False, Default = \"&h30", Scope = Protected
-	#tag EndConstant
-
 	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Protected
 	#tag EndConstant
 
@@ -239,8 +221,8 @@ Protected Module UnRAR
 
 
 	#tag Structure, Name = RARHeaderData, Flags = &h1
-		ArchiveName As String*260
-		  FileName As String*260
+		ArchiveName As CString*260
+		  FileName As CString*260
 		  Flags As UInt32
 		  PackedSize As UInt32
 		  UnpackedSize As UInt32
@@ -306,6 +288,16 @@ Protected Module UnRAR
 		  UserData As Ptr
 		Reserved As Ptr
 	#tag EndStructure
+
+
+	#tag Enum, Name = PackingMethods, Type = Integer, Flags = &h0
+		Store=&h30
+		  Fastest=&h31
+		  Fast=&h32
+		  Normal=&h33
+		  Good=&h34
+		Best=&h35
+	#tag EndEnum
 
 
 	#tag ViewBehavior

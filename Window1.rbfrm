@@ -256,7 +256,23 @@ End
 		    Listbox2.AddRow("Flags",  "0x" + Left(Hex(item.Flags) + "00000000", 8))
 		    Listbox2.AddRow("OS",  item.HostOS)
 		    Listbox2.AddRow("Min. Version",  Format(item.MinimumVersion, "#0.0#"))
-		    Listbox2.AddRow("Packing Method",  Str(item.PackingMethod))
+		    Select Case UnRAR.PackingMethods(item.PackingMethod)
+		    Case UnRAR.PackingMethods.Best
+		      Listbox2.AddRow("Packing Method", "Best")
+		    Case UnRAR.PackingMethods.Fast 
+		      Listbox2.AddRow("Packing Method", "Fast")
+		    Case UnRAR.PackingMethods.Fastest
+		      Listbox2.AddRow("Packing Method", "Fastest")
+		    Case UnRAR.PackingMethods.Good
+		      Listbox2.AddRow("Packing Method", "Good")
+		    Case UnRAR.PackingMethods.Normal
+		      Listbox2.AddRow("Packing Method", "Normal")
+		    Case UnRAR.PackingMethods.Store
+		      Listbox2.AddRow("Packing Method", "Store only")
+		    Else
+		      Listbox2.AddRow("Packing Method", Str(item.PackingMethod))
+		    End Select
+		    
 		  End If
 		End Sub
 	#tag EndEvent
