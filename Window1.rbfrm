@@ -157,13 +157,6 @@ End
 #tag EndWindow
 
 #tag WindowCode
-	#tag Event
-		Sub Open()
-		  MsgBox(Str(UnRAR.Version))
-		End Sub
-	#tag EndEvent
-
-
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.RARchive
 	#tag EndProperty
