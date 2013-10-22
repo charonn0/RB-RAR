@@ -160,7 +160,7 @@ Class RARchive
 		    Do Until Me.LastError <> 0
 		      mLastError = RARReadHeader(mHandle, header)
 		      If Index = i Then
-		        ritem = New RARItem(header, i)
+		        ritem = New RARItem(header, i, Me.RARFile)
 		        Exit Do
 		      Else
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)

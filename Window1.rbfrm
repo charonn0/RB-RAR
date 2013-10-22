@@ -42,7 +42,7 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   373
+      Height          =   249
       HelpTag         =   ""
       Hierarchical    =   ""
       Index           =   -2147483648
@@ -104,10 +104,66 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
+   Begin Listbox Listbox2
+      AutoDeactivate  =   True
+      AutoHideScrollbars=   True
+      Bold            =   ""
+      Border          =   True
+      ColumnCount     =   2
+      ColumnsResizable=   ""
+      ColumnWidths    =   ""
+      DataField       =   ""
+      DataSource      =   ""
+      DefaultRowHeight=   -1
+      Enabled         =   True
+      EnableDrag      =   ""
+      EnableDragReorder=   ""
+      GridLinesHorizontal=   0
+      GridLinesVertical=   0
+      HasHeading      =   True
+      HeadingIndex    =   -1
+      Height          =   98
+      HelpTag         =   ""
+      Hierarchical    =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      InitialValue    =   "Property	Value"
+      Italic          =   ""
+      Left            =   0
+      LockBottom      =   ""
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   ""
+      LockTop         =   True
+      RequiresSelection=   ""
+      Scope           =   0
+      ScrollbarHorizontal=   ""
+      ScrollBarVertical=   True
+      SelectionType   =   0
+      TabIndex        =   2
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0
+      TextUnit        =   0
+      Top             =   261
+      Underline       =   ""
+      UseFocusRing    =   True
+      Visible         =   True
+      Width           =   600
+      _ScrollWidth    =   -1
+   End
 End
 #tag EndWindow
 
 #tag WindowCode
+	#tag Event
+		Sub Open()
+		  MsgBox(Str(UnRAR.Version))
+		End Sub
+	#tag EndEvent
+
+
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.RARchive
 	#tag EndProperty
@@ -177,6 +233,32 @@ End
 		  End Select
 		  Return True
 		End Function
+	#tag EndEvent
+	#tag Event
+		Sub Change()
+		  Listbox2.DeleteAllRows
+		  If Me.ListIndex > -1 Then
+		    Dim item As RARItem = Me.RowTag(Me.ListIndex)
+		    If item = Nil Then Return
+		    Listbox2.AddRow("File Name",  item.FileName)
+		    Listbox2.AddRow("Time",  item.FileTime.SQLDateTime)
+		    Listbox2.AddRow("Archive", item.RARFile.AbsolutePath)
+		    Listbox2.AddRow("Volume", item.VolumeName)
+		    Listbox2.AddRow("Comment",  item.Comment)
+		    Listbox2.AddRow("Packed size",  Format(item.PackedSize, "###,###,###,###"))
+		    Listbox2.AddRow("Unpacked size",  Format(item.UnpackedSize, "###,###,###,###"))
+		    Listbox2.AddRow("Index",  Str(item.Index))
+		    Listbox2.AddRow("Encrypted",  Str(item.IsEncrypted))
+		    Listbox2.AddRow("Solid",  Str(item.IsSolid))
+		    Listbox2.AddRow("CRC32",  "0x" + Left(Hex(item.CRC32) + "00000000", 8))
+		    Listbox2.AddRow("Directory",  Str(item.Directory))
+		    Listbox2.AddRow("Attributes",  "0x" + Left(Hex(item.FileAttributes) + "00000000", 8))
+		    Listbox2.AddRow("Flags",  "0x" + Left(Hex(item.Flags) + "00000000", 8))
+		    Listbox2.AddRow("OS",  item.HostOS)
+		    Listbox2.AddRow("Min. Version",  Format(item.MinimumVersion, "#0.0#"))
+		    Listbox2.AddRow("Packing Method",  Str(item.PackingMethod))
+		  End If
+		End Sub
 	#tag EndEvent
 #tag EndEvents
 #tag Events PushButton1

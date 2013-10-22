@@ -1,12 +1,6 @@
 #tag Class
 Class RARItem
 	#tag Method, Flags = &h0
-		Function Archive() As FolderItem
-		  Return GetFolderItem(RawData.ArchiveName)
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
 		Function Comment() As String
 		  If RawData.CommentState = 1 Then
 		    Dim mb As MemoryBlock = RawData.CommentBuffer
@@ -16,9 +10,10 @@ Class RARItem
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(Data As RARHeaderData, Index As Integer)
+		Sub Constructor(Data As RARHeaderData, Index As Integer, RAR As FolderItem)
 		  RawData = Data
 		  mIndex = Index
+		  mRARFile = RAR
 		End Sub
 	#tag EndMethod
 
@@ -123,14 +118,30 @@ Class RARItem
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function RARFile() As FolderItem
+		  Return mRARFile
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function UnpackedSize() As UInt32
 		  Return RawData.UnpackedSize
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function VolumeName() As String
+		  Return RawData.ArchiveName
 		End Function
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h1
 		Protected mIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
+		Protected mRARFile As FolderItem
 	#tag EndProperty
 
 	#tag Property, Flags = &h1
