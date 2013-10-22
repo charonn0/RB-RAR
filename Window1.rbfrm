@@ -7,7 +7,7 @@ Begin Window Window1
    Frame           =   0
    FullScreen      =   False
    HasBackColor    =   False
-   Height          =   3.24e+2
+   Height          =   3.93e+2
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
@@ -23,15 +23,15 @@ Begin Window Window1
    Resizeable      =   True
    Title           =   "Untitled"
    Visible         =   True
-   Width           =   5.23e+2
+   Width           =   6.0e+2
    Begin Listbox Listbox1
       AutoDeactivate  =   True
       AutoHideScrollbars=   True
       Bold            =   ""
       Border          =   True
-      ColumnCount     =   4
+      ColumnCount     =   3
       ColumnsResizable=   ""
-      ColumnWidths    =   "50%,10%,5%,*"
+      ColumnWidths    =   "50%,25%,25%"
       DataField       =   ""
       DataSource      =   ""
       DefaultRowHeight=   -1
@@ -42,18 +42,18 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   247
+      Height          =   373
       HelpTag         =   ""
-      Hierarchical    =   True
+      Hierarchical    =   ""
       Index           =   -2147483648
       InitialParent   =   ""
-      InitialValue    =   "Name	Size	%	Date"
+      InitialValue    =   "Name	Size	Packed"
       Italic          =   ""
       Left            =   0
-      LockBottom      =   True
+      LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
-      LockRight       =   True
+      LockRight       =   ""
       LockTop         =   True
       RequiresSelection=   ""
       Scope           =   0
@@ -70,375 +70,104 @@ Begin Window Window1
       Underline       =   ""
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   523
+      Width           =   600
       _ScrollWidth    =   -1
    End
-   Begin Label ArchName
+   Begin PushButton PushButton1
       AutoDeactivate  =   True
       Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
+      ButtonStyle     =   0
+      Cancel          =   ""
+      Caption         =   "Open RAR"
+      Default         =   ""
       Enabled         =   True
-      Height          =   20
+      Height          =   22
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   ""
-      Left            =   8
+      Left            =   269
       LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   ""
       LockTop         =   True
-      Multiline       =   ""
       Scope           =   0
-      Selectable      =   False
       TabIndex        =   1
       TabPanelIndex   =   0
-      Text            =   "Archive Name Here"
-      TextAlign       =   1
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   249
-      Transparent     =   False
-      Underline       =   ""
-      Visible         =   True
-      Width           =   507
-   End
-   Begin Label Label1
-      AutoDeactivate  =   True
-      Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   8
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Multiline       =   ""
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   2
-      TabPanelIndex   =   0
-      Text            =   "File Name Here"
-      TextAlign       =   0
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   268
-      Transparent     =   False
-      Underline       =   ""
-      Visible         =   True
-      Width           =   168
-   End
-   Begin CheckBox IsSolid
-      AutoDeactivate  =   True
-      Bold            =   ""
-      Caption         =   "Solid"
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   False
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   8
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Scope           =   0
-      State           =   0
-      TabIndex        =   3
-      TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
-      Top             =   284
-      Underline       =   ""
-      Value           =   False
-      Visible         =   True
-      Width           =   100
-   End
-   Begin CheckBox IsEncrypted
-      AutoDeactivate  =   True
-      Bold            =   ""
-      Caption         =   "Encrypted"
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   False
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   8
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Scope           =   0
-      State           =   0
-      TabIndex        =   4
-      TabPanelIndex   =   0
-      TabStop         =   True
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   304
-      Underline       =   ""
-      Value           =   False
-      Visible         =   True
-      Width           =   100
-   End
-   Begin Label Label2
-      AutoDeactivate  =   True
-      Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   148
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Multiline       =   ""
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   5
-      TabPanelIndex   =   0
-      Text            =   "Item Comment:"
-      TextAlign       =   0
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   284
-      Transparent     =   False
+      Top             =   371
       Underline       =   ""
       Visible         =   True
-      Width           =   100
-   End
-   Begin Label Label3
-      AutoDeactivate  =   True
-      Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   148
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Multiline       =   ""
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   6
-      TabPanelIndex   =   0
-      Text            =   "Archive Comment:"
-      TextAlign       =   0
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   304
-      Transparent     =   False
-      Underline       =   ""
-      Visible         =   True
-      Width           =   100
-   End
-   Begin Label ArchComment
-      AutoDeactivate  =   True
-      Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   260
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Multiline       =   ""
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   7
-      TabPanelIndex   =   0
-      Text            =   "Archive Comment:"
-      TextAlign       =   0
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   304
-      Transparent     =   False
-      Underline       =   ""
-      Visible         =   True
-      Width           =   263
-   End
-   Begin Label ItemComment
-      AutoDeactivate  =   True
-      Bold            =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      Enabled         =   True
-      Height          =   20
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   260
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Multiline       =   ""
-      Scope           =   0
-      Selectable      =   False
-      TabIndex        =   8
-      TabPanelIndex   =   0
-      Text            =   "Item Comment:"
-      TextAlign       =   0
-      TextColor       =   &h000000
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   284
-      Transparent     =   False
-      Underline       =   ""
-      Visible         =   True
-      Width           =   263
+      Width           =   80
    End
 End
 #tag EndWindow
 
 #tag WindowCode
-	#tag Event
-		Sub Open()
-		  'Dim r As New UnRar.RARchive(GetOpenFolderItem(""))
-		  ''Call r.ExtractAll(SpecialFolder.Desktop.Child("Output"))
-		  ''Dim g As FolderItem = r.ExtractItem(3)
-		  ''g.MoveFileTo(SpecialFolder.Desktop)
-		  ''If r.TestAll Then
-		  ''Break
-		  ''Else
-		  ''Break
-		  ''End If
-		  ''Dim count As Integer = r.Count
-		  ''For i As Integer = 1 To count
-		  ''Dim ri As UnRAR.RARItem = r.Item(i)
-		  ''Call ri.FileTime
-		  ''Break
-		  ''Next
-		  ''Dim i As Integer = r.Count
-		  'Call r.TestAll
-		  ''Call r.TestItem(2)
-		  ''Call r.ExtractAll(SelectFolder)
-		  ''Dim f As FolderItem = r.ExtractItem(4)
-		  ''f.MoveFileTo(SpecialFolder.Desktop)
-		  'Quit
-		End Sub
-	#tag EndEvent
-
-
-	#tag Method, Flags = &h0
-		Sub DisplayArch(Item As RARItem)
-		  'ArchComment.Text = Item.Comment
-		  ArchName.Text = Item.Archive.AbsolutePath
-		  IsEncrypted.Value = Item.IsEncrypted
-		  IsSolid.Value = Item.IsSolid
-		  ItemComment.Text = Item.Comment
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub OpenArch(f As FolderItem)
-		  Listbox1.DeleteAllRows
-		  Dim r As New RARchive(f)
-		  Dim count As Integer = r.Count - 1
-		  For i As Integer = 0 To count
-		    Dim item As RARItem = r.Item(i)
-		    If item.Directory Then
-		      Listbox1.AddFolder(item.FileName)
-		    Else
-		      Dim d, sz, p As String
-		      d = item.FileTime.SQLDateTime
-		      sz = Format(item.UnpackedSize, "###,###,###,###")
-		      p = Format(item.PackedSize * 100 / item.UnpackedSize, "#0.0#\%")
-		      Listbox1.AddRow(item.FileName, sz, p, d)
-		    End If
-		    Listbox1.RowTag(Listbox1.LastIndex) = item
-		  Next
-		  ''Call r.ExtractAll(SpecialFolder.Desktop.Child("Output"))
-		  ''Dim g As FolderItem = r.ExtractItem(3)
-		  ''g.MoveFileTo(SpecialFolder.Desktop)
-		  ''If r.TestAll Then
-		  ''Break
-		  ''Else
-		  ''Break
-		  ''End If
-		  'Dim count As Integer = r.Count
-		  'For i As Integer = 1 To count
-		  'Dim ri As UnRAR.RARItem = r.Item(i)
-		  'Call ri.FileTime
-		  'Break
-		  'Next
-		End Sub
-	#tag EndMethod
+	#tag Property, Flags = &h1
+		Protected Archive As UnRAR.RARchive
+	#tag EndProperty
 
 
 #tag EndWindowCode
 
 #tag Events Listbox1
 	#tag Event
-		Sub Open()
-		  Me.AcceptFileDrop(FileTypes1.All)
-		End Sub
-	#tag EndEvent
-	#tag Event
-		Sub DropObject(obj As DragItem, action As Integer)
-		  #pragma Unused action
-		  If obj.FolderItemAvailable And Obj.FolderItem.IsRARArchive Then
-		    OpenArch(obj.FolderItem)
+		Function ConstructContextualMenu(base as MenuItem, x as Integer, y as Integer) As Boolean
+		  Dim row As Integer = Me.RowFromXY(X, Y)
+		  If row <= Me.ListCount - 1 Then
+		    Dim item As RARItem = Me.RowTag(row)
+		    Dim extract As New MenuItem("Extract " + item.FileName)
+		    extract.Tag = item
+		    base.Append(extract)
+		    Return True
 		  End If
-		End Sub
+		End Function
 	#tag EndEvent
 	#tag Event
-		Sub Change()
-		  If Me.ListIndex > -1 Then
-		    DisplayArch(Me.RowTag(Me.ListIndex))
+		Function ContextualMenuAction(hitItem as MenuItem) As Boolean
+		  Select Case Left(hitItem.Text, 7)
+		  Case "Extract"
+		    Dim item As RARItem = hitItem.Tag
+		    Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
+		    If f <> Nil Then
+		      If Self.Archive.ExtractItem(item.Index, f) Then
+		        MsgBox("Extracted")
+		      Else
+		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
+		      End If
+		    End If
+		    
+		  End Select
+		  Return True
+		End Function
+	#tag EndEvent
+#tag EndEvents
+#tag Events PushButton1
+	#tag Event
+		Sub Action()
+		  Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
+		  If rar <> Nil And rar.IsRARArchive Then
+		    Listbox1.DeleteAllRows
+		    Self.Archive = New RARchive(rar)
+		    Dim count As Integer = Archive.Count - 1
+		    For i As Integer = 0 To count
+		      Dim item As RARItem = Archive.Item(i)
+		      If item.Directory Then
+		        Listbox1.AddFolder(item.FileName)
+		      Else
+		        Dim d, sz, p As String
+		        d = item.FileTime.SQLDateTime
+		        sz = Format(item.UnpackedSize, "###,###,###,###")
+		        p = Format(item.PackedSize * 100 / item.UnpackedSize, "#0.0#\%")
+		        Listbox1.AddRow(item.FileName, sz, p, d)
+		      End If
+		      Listbox1.RowTag(Listbox1.LastIndex) = item
+		    Next
 		  End If
 		End Sub
 	#tag EndEvent

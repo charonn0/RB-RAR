@@ -41,14 +41,13 @@ Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function ExtractItem(Index As Integer, Password As String = "") As FolderItem
+		Function ExtractItem(Index As Integer, SaveTo As FolderItem, Password As String = "") As Boolean
 		  ' extracts the archived file at Index to a Temporary file, or Nil on error.
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
-		    Dim savedto As FolderItem
 		    Dim i As Integer
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
@@ -56,11 +55,9 @@ Class RARchive
 		      If i = Index Then
 		        If mLastError = 0 Then
 		          Dim head As New RARItem(header, i)
-		          savedto = SpecialFolder.Temporary.Child(NthField(head.FileName, "\", CountFields(head.FileName, "\")))
-		          Dim path As New MemoryBlock(savedto.AbsolutePath.LenB * 2)
-		          path.CString(0) = savedto.AbsolutePath + Chr(0)
+		          Dim path As New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
+		          path.CString(0) = SaveTo.AbsolutePath + Chr(0)
 		          mLastError = RARProcessFile(mHandle, RAR_EXTRACT, Nil, path)
-		          If mLastError <> 0 Then savedto = Nil
 		          Exit Do
 		        End If
 		      Else
@@ -69,7 +66,7 @@ Class RARchive
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    Return savedto
+		    Return mLastError = 0
 		  End If
 		End Function
 	#tag EndMethod
