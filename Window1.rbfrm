@@ -125,14 +125,18 @@ End
 		    extract.Tag = item
 		    base.Append(extract)
 		    base.Append(New MenuItem("Extract All"))
+		    Dim tst As New MenuItem("Test " + item.FileName)
+		    tst.Tag = item
+		    base.Append(tst)
+		    base.Append(New MenuItem("Test All"))
 		    Return True
 		  End If
 		End Function
 	#tag EndEvent
 	#tag Event
 		Function ContextualMenuAction(hitItem as MenuItem) As Boolean
-		  Select Case Left(hitItem.Text, 7)
-		  Case "Extract"
+		  Select Case Left(hitItem.Text, 4)
+		  Case "Extr"
 		    Dim item As RARItem = hitItem.Tag
 		    If item <> Nil Then
 		      Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
@@ -151,6 +155,22 @@ End
 		        Else
 		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
 		        End If
+		      End If
+		    End If
+		    
+		  Case "Test"
+		    Dim item As RARItem = hitItem.Tag
+		    If item <> Nil Then
+		      If Self.Archive.TestItem(item.Index) Then
+		        MsgBox("Test OK")
+		      Else
+		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
+		      End If
+		    Else
+		      If Self.Archive.TestAll() Then
+		        MsgBox("Test OK")
+		      Else
+		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
 		      End If
 		    End If
 		    

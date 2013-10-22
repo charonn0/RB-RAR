@@ -9,10 +9,57 @@ Class RARchive
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Comment() As String
+		  If UnRAR.IsAvailable Then
+		    Dim mHandle As Integer
+		    Dim data As RAROpenArchiveData
+		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
+		    path.CString(0) = RARFile.AbsolutePath
+		    Dim mb As New MemoryBlock(260 * 2)
+		    data.AchiveName = path
+		    data.OpenMode = UnRAR.RAR_OM_EXTRACT
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
+		    mHandle = UnRAR.RAROpenArchive(data)
+		    If mHandle <= 0 Then
+		      mLastError = data.OpenResult
+		      CloseArchive(mHandle)
+		      Return ""
+		    End If
+		    CloseArchive(mHandle)
+		    Dim comment As MemoryBlock = data.Comments
+		    Return comment.StringValue(0, data.CommentSize).Trim
+		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem)
 		  mRARFile = RARFile
 		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function Count() As Integer
+		  ' Returns the number of items in the archive
+		  If UnRAR.IsAvailable Then
+		    mLastError = 0
+		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
+		    Dim count As Integer
+		    While True
+		      Dim header As RARHeaderData
+		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		      If mLastError <> 0 Then Exit While
+		      mLastError = UnRAR.RARReadHeader(mHandle, header)
+		      If mLastError <> 0 Then Exit While
+		      count = count + 1
+		    Wend
+		    CloseArchive(mHandle)
+		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		    Return count
+		  End If
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -47,7 +94,7 @@ Class RARchive
 
 	#tag Method, Flags = &h0
 		Function ExtractItem(Index As Integer, SaveTo As FolderItem, Password As String = "") As Boolean
-		  ' extracts the archived file at Index to a Temporary file, or Nil on error.
+		  ' extracts the archived file at Index
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
@@ -59,7 +106,6 @@ Class RARchive
 		      mLastError = RARReadHeader(mHandle, header)
 		      If i = Index Then
 		        If mLastError = 0 Then
-		          Dim head As New RARItem(header, i)
 		          Dim path As New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
 		          path.CString(0) = SaveTo.AbsolutePath + Chr(0)
 		          mLastError = RARProcessFile(mHandle, RAR_EXTRACT, Nil, path)
@@ -94,6 +140,12 @@ Class RARchive
 		    CloseArchive(mHandle)
 		    Return data
 		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function HasComment() As Boolean
+		  Return Me.Comment.Trim <> ""
 		End Function
 	#tag EndMethod
 
@@ -158,22 +210,23 @@ Class RARchive
 		  ' tests all items in the archive
 		  ' tests a single item in the archive
 		  If UnRAR.IsAvailable Then
-		    Dim i, count As Integer
-		    count = Me.Count
+		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
-		    Dim success As Boolean
+		    
 		    Do Until Me.LastError <> 0
-		      If i > count Then
-		        Exit Do
-		      Else
+		      Dim header As RARHeaderData
+		      mLastError = RARReadHeader(mHandle, header)
+		      If mLastError = 0 Then
 		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
+		      Else
+		        If mLastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		        Exit Do
 		      End If
-		      success = (Me.LastError = 0)
-		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    Return success
+		    Return mLastError = 0
 		  End If
 		End Function
 	#tag EndMethod
@@ -182,22 +235,26 @@ Class RARchive
 		Function TestItem(Index As Integer, Password As String = "") As Boolean
 		  ' tests a single item in the archive
 		  If UnRAR.IsAvailable Then
+		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
-		    Dim success As Boolean
 		    Dim i As Integer
 		    Do Until Me.LastError <> 0
+		      Dim header As RARHeaderData
+		      mLastError = RARReadHeader(mHandle, header)
 		      If i = Index Then
-		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
-		        Exit Do
+		        If mLastError = 0 Then
+		          mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
+		          Exit Do
+		        End If
 		      Else
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
-		      success = (Me.LastError = 0)
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    Return success
+		    Return mLastError = 0
 		  End If
 		End Function
 	#tag EndMethod
@@ -225,57 +282,6 @@ Class RARchive
 		RARchives.
 	#tag EndNote
 
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  Dim mHandle As Integer
-			  Dim data As RAROpenArchiveData
-			  Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
-			  path.CString(0) = RARFile.AbsolutePath
-			  Dim mb As New MemoryBlock(260 * 2)
-			  data.AchiveName = path
-			  data.OpenMode = UnRAR.RAR_OM_EXTRACT
-			  data.CommentBufferSize = mb.Size
-			  data.Comments = mb
-			  mHandle = UnRAR.RAROpenArchive(data)
-			  If mHandle <= 0 Then
-			    mLastError = data.OpenResult
-			    CloseArchive(mHandle)
-			    Return ""
-			  End If
-			  CloseArchive(mHandle)
-			  Dim comment As MemoryBlock = data.Comments
-			  Return comment.StringValue(0, data.CommentSize)
-			End Get
-		#tag EndGetter
-		Comment As String
-	#tag EndComputedProperty
-
-	#tag ComputedProperty, Flags = &h0
-		#tag Getter
-			Get
-			  ' Returns the number of items in the archive
-			  If UnRAR.IsAvailable Then
-			    mLastError = 0
-			    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
-			    Dim count As Integer
-			    While True
-			      Dim header As RARHeaderData
-			      mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
-			      If mLastError <> 0 Then Exit While
-			      mLastError = UnRAR.RARReadHeader(mHandle, header)
-			      If mLastError <> 0 Then Exit While
-			      count = count + 1
-			    Wend
-			    CloseArchive(mHandle)
-			    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
-			    Return count
-			  End If
-			End Get
-		#tag EndGetter
-		Count As Integer
-	#tag EndComputedProperty
 
 	#tag Property, Flags = &h1
 		Protected mLastError As Integer
