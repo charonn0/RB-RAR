@@ -124,6 +124,7 @@ End
 		    Dim extract As New MenuItem("Extract " + item.FileName)
 		    extract.Tag = item
 		    base.Append(extract)
+		    base.Append(New MenuItem("Extract All"))
 		    Return True
 		  End If
 		End Function
@@ -133,12 +134,23 @@ End
 		  Select Case Left(hitItem.Text, 7)
 		  Case "Extract"
 		    Dim item As RARItem = hitItem.Tag
-		    Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
-		    If f <> Nil Then
-		      If Self.Archive.ExtractItem(item.Index, f) Then
-		        MsgBox("Extracted")
-		      Else
-		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
+		    If item <> Nil Then
+		      Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
+		      If f <> Nil Then
+		        If Self.Archive.ExtractItem(item.Index, f) Then
+		          MsgBox("Extracted")
+		        Else
+		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
+		        End If
+		      End If
+		    Else
+		      Dim f As FolderItem = SelectFolder()
+		      If f <> Nil Then
+		        If Self.Archive.ExtractAll(f) Then
+		          MsgBox("Extracted")
+		        Else
+		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
+		        End If
 		      End If
 		    End If
 		    

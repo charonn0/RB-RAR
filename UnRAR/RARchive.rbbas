@@ -18,24 +18,29 @@ Class RARchive
 	#tag Method, Flags = &h0
 		Function ExtractAll(OutputDirectory As FolderItem, Password As String = "") As Boolean
 		  ' extracts the entire archive to the specified output folder
+		  ' Use this method rather than iterating over the archive with
+		  ' the ExtractItem method.
+		  
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		    If mhandle <= 0 Then mLastError = mhandle * -1
-		    Dim success As Boolean
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
-		    Dim dir As MemoryBlock = OutputDirectory.AbsolutePath + Chr(0) + Chr(0)
-		    
+		    Dim path As New MemoryBlock(OutputDirectory.AbsolutePath.LenB * 2)
+		    path.CString(0) = OutputDirectory.AbsolutePath + Chr(0)
 		    Do Until Me.LastError <> 0
-		      Dim h As RARHeaderData
-		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_EXTRACT, dir, Nil)
-		      success = (mLastError = 0)
-		      If Not success Then Continue
-		      mLastError = UnRAR.RARReadHeader(mHandle, h)
-		      If h.FileName.Trim <> "" Then success = True
+		      Dim header As RARHeaderData
+		      mLastError = RARReadHeader(mHandle, header)
+		      If mLastError = 0 Then
+		        'Dim head As New RARItem(header, i)
+		        mLastError = RARProcessFile(mHandle, RAR_EXTRACT, path, Nil)
+		      Else
+		        If mLastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		        Exit Do
+		      End If
 		    Loop
 		    CloseArchive(mHandle)
-		    Return success
+		    Return mLastError = 0
 		  End If
 		End Function
 	#tag EndMethod
