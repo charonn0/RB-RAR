@@ -157,6 +157,25 @@ End
 #tag EndWindow
 
 #tag WindowCode
+	#tag Event
+		Sub Open()
+		  Dim rarfile As FolderItem = GetOpenFolderItem("")
+		  Dim myRARchive As New RARChive(rarfile)
+		  Dim item As RARItem = myRARchive.Item(19) ' the first file is at index zero
+		  If myRARchive.LastError = 0 Then
+		    Dim f As FolderItem = GetSaveFolderItem("", item.FileName) ' prompt user for a save location
+		    If f <> Nil Then
+		      If myRARchive.ExtractItem(0, f) Then
+		        MsgBox(item.FileName + " extracted to " + f.AbsolutePath)
+		      Else
+		        MsgBox("RAR error " + Str(myRARchive.LastError) + ": " + UnRAR.FormatError(myRARchive.LastError))
+		      End If
+		    End If
+		  End If
+		End Sub
+	#tag EndEvent
+
+
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.RARchive
 	#tag EndProperty
@@ -252,7 +271,7 @@ End
 		    Select Case UnRAR.PackingMethods(item.PackingMethod)
 		    Case UnRAR.PackingMethods.Best
 		      Listbox2.AddRow("Packing Method", "Best")
-		    Case UnRAR.PackingMethods.Fast 
+		    Case UnRAR.PackingMethods.Fast
 		      Listbox2.AddRow("Packing Method", "Fast")
 		    Case UnRAR.PackingMethods.Fastest
 		      Listbox2.AddRow("Packing Method", "Fastest")
