@@ -237,13 +237,21 @@ End
 	#tag EndEvent
 	#tag Event
 		Function ContextualMenuAction(hitItem as MenuItem) As Boolean
+		  Dim item As RARItem = hitItem.Tag
+		  Dim pw As String
+		  If item <> Nil And item.IsEncrypted Then
+		    pw = RARPasswordWin.GetPassword(item.RARFile)
+		  ElseIf item = Nil Then
+		    Dim item1 As RARItem = Me.RowTag(0)
+		    If item1 <> Nil Then pw = RARPasswordWin.GetPassword(item1.RARFile)
+		  End If
+		  
 		  Select Case Left(hitItem.Text, 4)
 		  Case "Extr"
-		    Dim item As RARItem = hitItem.Tag
 		    If item <> Nil Then
 		      Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
 		      If f <> Nil Then
-		        If Self.Archive.ExtractItem(item.Index, f) Then
+		        If Self.Archive.ExtractItem(item.Index, f, pw) Then
 		          MsgBox("Extracted")
 		        Else
 		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
@@ -252,7 +260,7 @@ End
 		    Else
 		      Dim f As FolderItem = SelectFolder()
 		      If f <> Nil Then
-		        If Self.Archive.ExtractAll(f) Then
+		        If Self.Archive.ExtractAll(f, pw) Then
 		          MsgBox("Extracted")
 		        Else
 		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
@@ -260,16 +268,17 @@ End
 		      End If
 		    End If
 		    
+		    
 		  Case "Test"
-		    Dim item As RARItem = hitItem.Tag
+		    
 		    If item <> Nil Then
-		      If Self.Archive.TestItem(item.Index) Then
+		      If Self.Archive.TestItem(item.Index, pw) Then
 		        MsgBox("Test OK")
 		      Else
 		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
 		      End If
 		    Else
-		      If Self.Archive.TestAll() Then
+		      If Self.Archive.TestAll(pw) Then
 		        MsgBox("Test OK")
 		      Else
 		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
