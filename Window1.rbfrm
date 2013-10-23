@@ -250,7 +250,7 @@ End
 		    pw = RARPasswordWin.GetPassword(item.RARFile)
 		  ElseIf item = Nil Then
 		    Dim item1 As RARItem = Me.RowTag(0)
-		    If item1 <> Nil Then pw = RARPasswordWin.GetPassword(item1.RARFile)
+		    If item1 <> Nil And item1.IsEncrypted Then pw = RARPasswordWin.GetPassword(item1.RARFile)
 		  End If
 		  
 		  Select Case Left(hitItem.Text, 4)
