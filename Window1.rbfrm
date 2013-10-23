@@ -7,7 +7,7 @@ Begin Window Window1
    Frame           =   0
    FullScreen      =   False
    HasBackColor    =   False
-   Height          =   3.93e+2
+   Height          =   3.76e+2
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
@@ -42,7 +42,7 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   249
+      Height          =   220
       HelpTag         =   ""
       Hierarchical    =   ""
       Index           =   -2147483648
@@ -50,10 +50,10 @@ Begin Window Window1
       InitialValue    =   "Name	Size	Packed"
       Italic          =   ""
       Left            =   0
-      LockBottom      =   ""
+      LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   True
-      LockRight       =   ""
+      LockRight       =   True
       LockTop         =   True
       RequiresSelection=   ""
       Scope           =   0
@@ -66,7 +66,7 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
-      Top             =   0
+      Top             =   29
       Underline       =   ""
       UseFocusRing    =   True
       Visible         =   True
@@ -86,11 +86,11 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   ""
-      Left            =   269
+      Left            =   520
       LockBottom      =   ""
       LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
+      LockLeft        =   False
+      LockRight       =   True
       LockTop         =   True
       Scope           =   0
       TabIndex        =   1
@@ -99,7 +99,7 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
-      Top             =   371
+      Top             =   2
       Underline       =   ""
       Visible         =   True
       Width           =   80
@@ -122,7 +122,7 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   98
+      Height          =   123
       HelpTag         =   ""
       Hierarchical    =   ""
       Index           =   -2147483648
@@ -130,11 +130,11 @@ Begin Window Window1
       InitialValue    =   "Property	Value"
       Italic          =   ""
       Left            =   0
-      LockBottom      =   ""
+      LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
+      LockRight       =   True
+      LockTop         =   False
       RequiresSelection=   ""
       Scope           =   0
       ScrollbarHorizontal=   ""
@@ -146,12 +146,46 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
-      Top             =   261
+      Top             =   253
       Underline       =   ""
       UseFocusRing    =   True
       Visible         =   True
       Width           =   600
       _ScrollWidth    =   -1
+   End
+   Begin Label Label1
+      AutoDeactivate  =   True
+      Bold            =   ""
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   20
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   ""
+      Left            =   6
+      LockBottom      =   ""
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      Multiline       =   ""
+      Scope           =   0
+      Selectable      =   False
+      TabIndex        =   3
+      TabPanelIndex   =   0
+      Text            =   "No Archive"
+      TextAlign       =   0
+      TextColor       =   &h000000
+      TextFont        =   "System"
+      TextSize        =   0
+      TextUnit        =   0
+      Top             =   2
+      Transparent     =   False
+      Underline       =   ""
+      Visible         =   True
+      Width           =   510
    End
 End
 #tag EndWindow
@@ -159,19 +193,19 @@ End
 #tag WindowCode
 	#tag Event
 		Sub Open()
-		  Dim rarfile As FolderItem = GetOpenFolderItem("")
-		  Dim myRARchive As New RARChive(rarfile)
-		  Dim item As RARItem = myRARchive.Item(19) ' the first file is at index zero
-		  If myRARchive.LastError = 0 Then
-		    Dim f As FolderItem = GetSaveFolderItem("", item.FileName) ' prompt user for a save location
-		    If f <> Nil Then
-		      If myRARchive.ExtractItem(0, f) Then
-		        MsgBox(item.FileName + " extracted to " + f.AbsolutePath)
-		      Else
-		        MsgBox("RAR error " + Str(myRARchive.LastError) + ": " + UnRAR.FormatError(myRARchive.LastError))
-		      End If
-		    End If
-		  End If
+		  'Dim rarfile As FolderItem = GetOpenFolderItem("")
+		  'Dim myRARchive As New RARChive(rarfile)
+		  'Dim item As RARItem = myRARchive.Item(19) ' the first file is at index zero
+		  'If myRARchive.LastError = 0 Then
+		  'Dim f As FolderItem = GetSaveFolderItem("", item.FileName) ' prompt user for a save location
+		  'If f <> Nil Then
+		  'If myRARchive.ExtractItem(0, f) Then
+		  'MsgBox(item.FileName + " extracted to " + f.AbsolutePath)
+		  'Else
+		  'MsgBox("RAR error " + Str(myRARchive.LastError) + ": " + UnRAR.FormatError(myRARchive.LastError))
+		  'End If
+		  'End If
+		  'End If
 		End Sub
 	#tag EndEvent
 
@@ -295,10 +329,12 @@ End
 		  Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
 		  If rar <> Nil And rar.IsRARArchive Then
 		    Listbox1.DeleteAllRows
+		    Label1.Text = rar.AbsolutePath
 		    Self.Archive = New RARchive(rar)
-		    Dim count As Integer = Archive.Count - 1
-		    For i As Integer = 0 To count
+		    Dim count As Integer = Archive.Count
+		    For i As Integer = 0 To count - 1
 		      Dim item As RARItem = Archive.Item(i)
+		      If item.FileName.Trim = "" Then Break
 		      If item.Directory Then
 		        Listbox1.AddFolder(item.FileName)
 		      Else
@@ -310,6 +346,7 @@ End
 		      End If
 		      Listbox1.RowTag(Listbox1.LastIndex) = item
 		    Next
+		    Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
 		  End If
 		End Sub
 	#tag EndEvent

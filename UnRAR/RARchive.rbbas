@@ -26,9 +26,10 @@ Class RARchive
 		      CloseArchive(mHandle)
 		      Return ""
 		    End If
-		    If mHandle > 0 Then CloseArchive(mHandle)
 		    Dim comment As MemoryBlock = data.Comments
-		    Return comment.StringValue(0, data.CommentSize).Trim
+		    Dim sz As Integer = data.CommentSize
+		    If mHandle > 0 Then CloseArchive(mHandle)
+		    Return comment.StringValue(0, sz).Trim
 		  End If
 		End Function
 	#tag EndMethod
@@ -46,17 +47,18 @@ Class RARchive
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
+		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    Dim count As Integer
-		    While True
+		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
-		      mLastError = UnRAR.RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
-		      If mLastError <> 0 Then Exit While
-		      mLastError = UnRAR.RARReadHeader(mHandle, header)
-		      If mLastError <> 0 Then Exit While
-		      count = count + 1
-		    Wend
+		      mLastError = RARReadHeader(mHandle, header)
+		      If mLastError = 0 Then
+		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		        count = count + 1
+		      End If
+		    Loop
 		    If mHandle > 0 Then CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		    If Me.LastError = ErrorEndArchive Then mLastError = 0 ' not an error
 		    Return count
 		  End If
 		End Function
@@ -141,12 +143,6 @@ Class RARchive
 		    CloseArchive(mHandle)
 		    Return data
 		  End If
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Function HasComment() As Boolean
-		  Return Me.Comment.Trim <> ""
 		End Function
 	#tag EndMethod
 
