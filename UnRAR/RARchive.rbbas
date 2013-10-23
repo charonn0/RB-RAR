@@ -73,6 +73,7 @@ Class RARchive
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    Dim i As Integer
 		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
 		    Dim path As New MemoryBlock(OutputDirectory.AbsolutePath.LenB * 2)
@@ -81,12 +82,16 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError = 0 Then
-		        'Dim head As New RARItem(header, i)
+		        Dim pitem As New RARItem(header, i, RARFile)
 		        mLastError = RARProcessFile(mHandle, RAR_EXTRACT, path, Nil)
+		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_EXTRACT) Then 
+		          Exit Do
+		        End If
 		      Else
 		        If mLastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		        Exit Do
 		      End If
+		      i = i + 1
 		    Loop
 		    If mHandle > 0 Then CloseArchive(mHandle)
 		    Return mLastError = 0
@@ -106,15 +111,18 @@ Class RARchive
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
+		      Dim pitem As New RARItem(header, i, RARFile)
 		      If i = Index Then
 		        If mLastError = 0 Then
 		          Dim path As New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
 		          path.CString(0) = SaveTo.AbsolutePath + Chr(0)
 		          mLastError = RARProcessFile(mHandle, RAR_EXTRACT, Nil, path)
+		          If mLastError <> 0 Then Call RaiseEvent ItemProcessed(pitem, RAR_EXTRACT)
 		          Exit Do
 		        End If
 		      Else
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_SKIP) Then Exit Do
 		      End If
 		      i = i + 1
 		    Loop
@@ -137,10 +145,12 @@ Class RARchive
 		    
 		    Do Until Me.LastError <> 0
 		      mLastError = RARReadHeader(mHandle, header)
-		      If Index = i Then
+		      If Index = i And mLastError = 0 Then
 		        ritem = New RARItem(header, i, Me.RARFile)
+		        Call RaiseEvent ItemProcessed(ritem, RAR_EXTRACT)
 		        Exit Do
-		      Else
+		      ElseIf mLastError = 0 Then
+		        If RaiseEvent ItemProcessed(New RARItem(header, i, RARFile), RAR_SKIP) Then Exit Do
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
 		      i = i + 1
@@ -191,21 +201,25 @@ Class RARchive
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		    Dim i As Integer
 		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    If Password <> "" Then RARSetPassword(mHandle, Password)
-		    
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError = 0 Then
+		        Dim pitem As New RARItem(header, i, RARFile)
 		        mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
+		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_TEST) Then
+		          Exit Do
+		        End If
 		      Else
 		        If mLastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		        Exit Do
 		      End If
+		      i = i + 1
 		    Loop
 		    If mHandle > 0 Then CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return mLastError = 0
 		  End If
 		End Function
@@ -223,13 +237,16 @@ Class RARchive
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
+		      Dim pitem As New RARItem(header, i, RARFile)
 		      If i = Index Then
 		        If mLastError = 0 Then
 		          mLastError = RARProcessFile(mHandle, RAR_TEST, Nil, Nil)
+		          If mLastError <> 0 Then Call RaiseEvent ItemProcessed(pitem, RAR_TEST)
 		          Exit Do
 		        End If
 		      Else
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
+		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_SKIP) Then Exit Do
 		      End If
 		      i = i + 1
 		    Loop
@@ -239,6 +256,11 @@ Class RARchive
 		  End If
 		End Function
 	#tag EndMethod
+
+
+	#tag Hook, Flags = &h0
+		Event ItemProcessed(Item As RARItem, Operation As Integer) As Boolean
+	#tag EndHook
 
 
 	#tag Note, Name = About this class

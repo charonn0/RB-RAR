@@ -210,6 +210,13 @@ End
 	#tag EndEvent
 
 
+	#tag Method, Flags = &h0
+		Function ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer) As Boolean
+		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
+		End Function
+	#tag EndMethod
+
+
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.RARchive
 	#tag EndProperty
@@ -340,6 +347,7 @@ End
 		    Listbox1.DeleteAllRows
 		    Label1.Text = rar.AbsolutePath
 		    Self.Archive = New RARchive(rar)
+		    AddHandler Self.Archive.ItemProcessed, WeakAddressOf Self.ProcessHandler
 		    Dim count As Integer = Archive.Count
 		    For i As Integer = 0 To count - 1
 		      Dim item As RARItem = Archive.Item(i)
