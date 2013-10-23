@@ -125,27 +125,6 @@ Class RARchive
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Shared Function GetArchiveInfo(RARFile As FolderItem) As RAROpenArchiveData
-		  If UnRAR.IsAvailable Then
-		    Dim mHandle, err As Integer
-		    Dim mb As New MemoryBlock(260 * 2)
-		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
-		    path.CString(0) = RARFile.AbsolutePath
-		    Dim data As RAROpenArchiveData
-		    data.CommentBufferSize = mb.Size
-		    data.Comments = mb
-		    data.AchiveName = path
-		    data.OpenMode = RAR_OM_EXTRACT
-		    mHandle = UnRAR.RAROpenArchive(data)
-		    err = data.OpenResult
-		    If mHandle <= 0 Then data.OpenResult = err * -1
-		    CloseArchive(mHandle)
-		    Return data
-		  End If
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0
 		Function Item(Index As Integer) As RARItem
 		  ' Retrieves the header for a single item
@@ -276,7 +255,7 @@ Class RARchive
 		The Comment method returns the archive comment, if any.
 		
 		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
-		instance can have the archive open (for extraction, testing, or counting) at any given moment.
+		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.
 		
 		Avoid unneccessary calls to RARchive.Count as each call must enumerate the contents of the entire archive. Similarly,
 		the execution time of RARchive.Item rises in direct proportion to the Index of the file being retrieved. Patterns
