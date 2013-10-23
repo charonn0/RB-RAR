@@ -147,10 +147,8 @@ Class RARchive
 		      mLastError = RARReadHeader(mHandle, header)
 		      If Index = i And mLastError = 0 Then
 		        ritem = New RARItem(header, i, Me.RARFile)
-		        Call RaiseEvent ItemProcessed(ritem, RAR_EXTRACT)
 		        Exit Do
 		      ElseIf mLastError = 0 Then
-		        If RaiseEvent ItemProcessed(New RARItem(header, i, RARFile), RAR_SKIP) Then Exit Do
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
 		      i = i + 1
