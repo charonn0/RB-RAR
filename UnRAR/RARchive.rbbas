@@ -2,7 +2,7 @@
 Class RARchive
 	#tag Method, Flags = &h1
 		Protected Shared Sub CloseArchive(RARHandle As Integer)
-		  If UnRAR.IsAvailable Then
+		  If UnRAR.IsAvailable And RARHandle > 0 Then
 		    Call RARCloseArchive(RARHandle)
 		  End If
 		End Sub
@@ -28,7 +28,7 @@ Class RARchive
 		    End If
 		    Dim comment As MemoryBlock = data.Comments
 		    Dim sz As Integer = data.CommentSize
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    Return comment.StringValue(0, sz).Trim
 		  End If
 		End Function
@@ -57,7 +57,7 @@ Class RARchive
 		        count = count + 1
 		      End If
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    If Me.LastError = ErrorEndArchive Then mLastError = 0 ' not an error
 		    Return count
 		  End If
@@ -84,7 +84,7 @@ Class RARchive
 		      If mLastError = 0 Then
 		        Dim pitem As New RARItem(header, i, RARFile)
 		        mLastError = RARProcessFile(mHandle, RAR_EXTRACT, path, Nil)
-		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_EXTRACT) Then 
+		        If mLastError = 0 And RaiseEvent ItemProcessed(pitem, RAR_EXTRACT) Then
 		          Exit Do
 		        End If
 		      Else
@@ -93,7 +93,7 @@ Class RARchive
 		      End If
 		      i = i + 1
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    Return mLastError = 0
 		  End If
 		End Function
@@ -126,7 +126,7 @@ Class RARchive
 		      End If
 		      i = i + 1
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return mLastError = 0
 		  End If
@@ -153,7 +153,7 @@ Class RARchive
 		      End If
 		      i = i + 1
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return ritem
 		  End If
@@ -217,7 +217,7 @@ Class RARchive
 		      End If
 		      i = i + 1
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    Return mLastError = 0
 		  End If
 		End Function
@@ -248,7 +248,7 @@ Class RARchive
 		      End If
 		      i = i + 1
 		    Loop
-		    If mHandle > 0 Then CloseArchive(mHandle)
+		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return mLastError = 0
 		  End If
