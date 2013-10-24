@@ -360,6 +360,33 @@ End
 		  End If
 		End Sub
 	#tag EndEvent
+	#tag Event
+		Function CompareRows(row1 as Integer, row2 as Integer, column as Integer, ByRef result as Integer) As Boolean
+		  If column = 1 Then
+		    Dim sz As Integer = Listbox1.CellTag(row1, 1)
+		    Dim sz2 As Integer = Listbox1.CellTag(row2, 1)
+		    If sz < sz2 Then
+		      result = -1
+		    ElseIf sz > sz2 Then
+		      result = 1
+		    Else
+		      result = 0
+		    End If
+		    Return True
+		  ElseIf column = 2 Then
+		    Dim sz As Double = Listbox1.CellTag(row1, 2)
+		    Dim sz2 As Double = Listbox1.CellTag(row2, 2)
+		    If sz < sz2 Then
+		      result = -1
+		    ElseIf sz > sz2 Then
+		      result = 1
+		    Else
+		      result = 0
+		    End If
+		    Return True
+		  End If
+		End Function
+	#tag EndEvent
 #tag EndEvents
 #tag Events PushButton1
 	#tag Event
@@ -384,6 +411,8 @@ End
 		        sz = Format(item.UnpackedSize, "###,###,###,###")
 		        p = Format(item.PackedSize * 100 / item.UnpackedSize, "#0.0#\%")
 		        Listbox1.AddRow(item.FileName, sz, p, d)
+		        Listbox1.CellTag(Listbox1.LastIndex, 1) = item.UnpackedSize
+		        Listbox1.CellTag(Listbox1.LastIndex, 2) = item.PackedSize * 100 / item.UnpackedSize
 		      End If
 		      Listbox1.RowTag(Listbox1.LastIndex) = item
 		    Next
