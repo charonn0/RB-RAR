@@ -7,7 +7,7 @@ Begin Window Window1
    Frame           =   0
    FullScreen      =   False
    HasBackColor    =   False
-   Height          =   3.76e+2
+   Height          =   4.73e+2
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
@@ -42,7 +42,7 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   220
+      Height          =   258
       HelpTag         =   ""
       Hierarchical    =   ""
       Index           =   -2147483648
@@ -122,7 +122,7 @@ Begin Window Window1
       GridLinesVertical=   0
       HasHeading      =   True
       HeadingIndex    =   -1
-      Height          =   123
+      Height          =   166
       HelpTag         =   ""
       Hierarchical    =   ""
       Index           =   -2147483648
@@ -146,7 +146,7 @@ Begin Window Window1
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
-      Top             =   253
+      Top             =   307
       Underline       =   ""
       UseFocusRing    =   True
       Visible         =   True
@@ -187,6 +187,27 @@ Begin Window Window1
       Visible         =   True
       Width           =   510
    End
+   Begin ProgressBar ProgressBar1
+      AutoDeactivate  =   True
+      Enabled         =   True
+      Height          =   9
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Left            =   0
+      LockBottom      =   ""
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   ""
+      LockTop         =   True
+      Maximum         =   100
+      Scope           =   0
+      TabPanelIndex   =   0
+      Top             =   292
+      Value           =   0
+      Visible         =   True
+      Width           =   600
+   End
 End
 #tag EndWindow
 
@@ -213,6 +234,7 @@ End
 	#tag Method, Flags = &h0
 		Function ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer) As Boolean
 		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
+		  ProgressBar1.Value = Item.Index
 		End Function
 	#tag EndMethod
 
@@ -349,6 +371,8 @@ End
 		    Self.Archive = New RARchive(rar)
 		    AddHandler Self.Archive.ItemProcessed, WeakAddressOf Self.ProcessHandler
 		    Dim count As Integer = Archive.Count
+		    ProgressBar1.Maximum = count - 1
+		    ProgressBar1.Value = 0
 		    For i As Integer = 0 To count - 1
 		      Dim item As RARItem = Archive.Item(i)
 		      If item.FileName.Trim = "" Then Break
@@ -364,6 +388,11 @@ End
 		      Listbox1.RowTag(Listbox1.LastIndex) = item
 		    Next
 		    Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
+		  End If
+		  
+		Exception
+		  If Self.Archive.LastError <> 0 Then
+		    MsgBox("RAR error: " + Str(Self.Archive.LastError))
 		  End If
 		End Sub
 	#tag EndEvent
