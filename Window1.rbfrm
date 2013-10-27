@@ -7,7 +7,7 @@ Begin Window Window1
    Frame           =   0
    FullScreen      =   False
    HasBackColor    =   False
-   Height          =   4.73e+2
+   Height          =   5.85e+2
    ImplicitInstance=   True
    LiveResize      =   True
    MacProcID       =   0
@@ -19,9 +19,9 @@ Begin Window Window1
    MinHeight       =   64
    MinimizeButton  =   True
    MinWidth        =   64
-   Placement       =   0
-   Resizeable      =   True
-   Title           =   "Untitled"
+   Placement       =   2
+   Resizeable      =   False
+   Title           =   "UnRar demo"
    Visible         =   True
    Width           =   6.0e+2
    Begin Listbox Listbox1
@@ -104,54 +104,32 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
-   Begin Listbox Listbox2
+   Begin GroupBox GroupBox1
       AutoDeactivate  =   True
-      AutoHideScrollbars=   True
       Bold            =   ""
-      Border          =   True
-      ColumnCount     =   2
-      ColumnsResizable=   ""
-      ColumnWidths    =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      DefaultRowHeight=   -1
+      Caption         =   "Selected Item Properties"
       Enabled         =   True
-      EnableDrag      =   ""
-      EnableDragReorder=   ""
-      GridLinesHorizontal=   0
-      GridLinesVertical=   0
-      HasHeading      =   True
-      HeadingIndex    =   -1
-      Height          =   166
+      Height          =   269
       HelpTag         =   ""
-      Hierarchical    =   ""
       Index           =   -2147483648
       InitialParent   =   ""
-      InitialValue    =   "Property	Value"
       Italic          =   ""
-      Left            =   0
-      LockBottom      =   True
+      Left            =   6
+      LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
-      LockRight       =   True
-      LockTop         =   False
-      RequiresSelection=   ""
+      LockRight       =   ""
+      LockTop         =   True
       Scope           =   0
-      ScrollbarHorizontal=   ""
-      ScrollBarVertical=   True
-      SelectionType   =   0
-      TabIndex        =   2
+      TabIndex        =   4
       TabPanelIndex   =   0
-      TabStop         =   True
       TextFont        =   "System"
       TextSize        =   0
       TextUnit        =   0
       Top             =   307
       Underline       =   ""
-      UseFocusRing    =   True
       Visible         =   True
-      Width           =   600
-      _ScrollWidth    =   -1
+      Width           =   588
    End
    Begin Label Label1
       AutoDeactivate  =   True
@@ -208,6 +186,55 @@ Begin Window Window1
       Visible         =   True
       Width           =   600
    End
+   Begin Listbox Listbox2
+      AutoDeactivate  =   True
+      AutoHideScrollbars=   True
+      Bold            =   ""
+      Border          =   True
+      ColumnCount     =   2
+      ColumnsResizable=   ""
+      ColumnWidths    =   ""
+      DataField       =   ""
+      DataSource      =   ""
+      DefaultRowHeight=   -1
+      Enabled         =   True
+      EnableDrag      =   ""
+      EnableDragReorder=   ""
+      GridLinesHorizontal=   0
+      GridLinesVertical=   0
+      HasHeading      =   True
+      HeadingIndex    =   -1
+      Height          =   237
+      HelpTag         =   ""
+      Hierarchical    =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      InitialValue    =   "Property	Value"
+      Italic          =   ""
+      Left            =   20
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   False
+      RequiresSelection=   ""
+      Scope           =   0
+      ScrollbarHorizontal=   ""
+      ScrollBarVertical=   True
+      SelectionType   =   0
+      TabIndex        =   2
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0
+      TextUnit        =   0
+      Top             =   328
+      Underline       =   ""
+      UseFocusRing    =   True
+      Visible         =   True
+      Width           =   560
+      _ScrollWidth    =   -1
+   End
 End
 #tag EndWindow
 
@@ -232,15 +259,19 @@ End
 
 
 	#tag Method, Flags = &h0
-		Function ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer) As Boolean
+		Sub ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer, ByRef SaveTo As FolderItem)
 		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
 		  ProgressBar1.Value = Item.Index
-		End Function
+		End Sub
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.RARchive
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
+		Protected LastTop As Integer
 	#tag EndProperty
 
 
@@ -250,7 +281,7 @@ End
 	#tag Event
 		Function ConstructContextualMenu(base as MenuItem, x as Integer, y as Integer) As Boolean
 		  Dim row As Integer = Me.RowFromXY(X, Y)
-		  If row <= Me.ListCount - 1 Then
+		  If row > -1 Then
 		    Dim item As RARItem = Me.RowTag(row)
 		    Dim extract As New MenuItem("Extract " + item.FileName)
 		    extract.Tag = item
@@ -289,7 +320,7 @@ End
 		    Else
 		      Dim f As FolderItem = SelectFolder()
 		      If f <> Nil Then
-		        If Self.Archive.ExtractAll(f, pw) Then
+		        If Self.Archive.ExtractItem(-1, f, pw) Then
 		          MsgBox("Extracted")
 		        Else
 		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
@@ -307,7 +338,7 @@ End
 		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
 		      End If
 		    Else
-		      If Self.Archive.TestAll(pw) Then
+		      If Self.Archive.TestItem(-1, pw) Then
 		        MsgBox("Test OK")
 		      Else
 		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
@@ -396,7 +427,7 @@ End
 		    Listbox1.DeleteAllRows
 		    Label1.Text = rar.AbsolutePath
 		    Self.Archive = New RARchive(rar)
-		    AddHandler Self.Archive.ItemProcessed, WeakAddressOf Self.ProcessHandler
+		    AddHandler Self.Archive.ProcessItem, WeakAddressOf Self.ProcessHandler
 		    Dim count As Integer = Archive.Count
 		    ProgressBar1.Maximum = count - 1
 		    ProgressBar1.Value = 0

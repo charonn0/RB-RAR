@@ -1,6 +1,14 @@
 #tag Module
 Protected Module UnRAR
 	#tag Method, Flags = &h1
+		Protected Sub CloseArchive(RARHandle As Integer)
+		  If UnRAR.IsAvailable And RARHandle > 0 Then
+		    Call RARCloseArchive(RARHandle)
+		  End If
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
 		  Case ErrorBadArchive
@@ -50,6 +58,26 @@ Protected Module UnRAR
 		Exception err
 		  If err IsA ThreadEndException Or err IsA EndException Then Raise err
 		  Return False
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
+		  If UnRAR.IsAvailable Then
+		    Dim mHandle, err As Integer
+		    Dim mb As New MemoryBlock(260 * 2)
+		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
+		    path.CString(0) = RARFile.AbsolutePath
+		    Dim data As RAROpenArchiveData
+		    data.CommentBufferSize = mb.Size
+		    data.Comments = mb
+		    data.AchiveName = path
+		    data.OpenMode = mode
+		    mHandle = UnRAR.RAROpenArchive(data)
+		    err = data.OpenResult
+		    If mHandle <= 0 Then Return err * -1
+		    Return mHandle
+		  End If
 		End Function
 	#tag EndMethod
 
