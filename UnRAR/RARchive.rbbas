@@ -2,6 +2,7 @@
 Class RARchive
 	#tag Method, Flags = &h0
 		Function Comment() As String
+		  ' Returns the archive comment, if any
 		  If UnRAR.IsAvailable Then
 		    Dim mHandle As Integer
 		    Dim data As RAROpenArchiveData
@@ -35,6 +36,7 @@ Class RARchive
 
 	#tag Method, Flags = &h0
 		Function Count() As Integer
+		  '  Returns the number of items in the archive
 		  Return UBound(Me.ListItems) + 1
 		End Function
 	#tag EndMethod
@@ -118,7 +120,7 @@ Class RARchive
 
 	#tag Method, Flags = &h0
 		Function ListItems() As RARItem()
-		  ' Returns the number of items in the archive
+		  ' Returns a list of all items in the archive
 		  If UnRAR.IsAvailable Then
 		    Dim items() As RARItem
 		    mLastError = 0
@@ -187,24 +189,22 @@ Class RARchive
 
 	#tag Note, Name = About this class
 		This class represents a RAR archive. Pass the RAR as a FolderItem to the class constructor. To access
-		files inside the archive call the ExtractAll or ExtractItem methods. 
+		files inside the archive call the ExtractItem method.
 		
 		To retreive metadata for a particular item, call the Item method. The Item method returns a RARItem 
 		for the archived file at the specified Index.
 		
-		To test a single file in the archive, call TestItem; to test all files, call TestAll.
+		To test file(s), call TestItem.
 		
 		Indices passed to Item, ExtractItem, and TestItem are zero-based: they run from 0 to RARchive.Count-1.
+		Pass -1 as the Index to operate on all items in the archive.
 		
 		The Comment method returns the archive comment, if any.
 		
 		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
 		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.
 		
-		Avoid unneccessary calls to RARchive.Count as each call must enumerate the contents of the entire archive. Similarly,
-		the execution time of RARchive.Item rises in direct proportion to the Index of the file being retrieved. Patterns
-		and optimizations appropriate for enumerating a directory via the FolderItem class are equally appropriate for 
-		RARchives.
+		ExtractItem and TestItem will raise the ProcessItem event for each item in the archive.
 	#tag EndNote
 
 
