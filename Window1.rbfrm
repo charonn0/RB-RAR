@@ -428,11 +428,13 @@ End
 		    Label1.Text = rar.AbsolutePath
 		    Self.Archive = New RARchive(rar)
 		    AddHandler Self.Archive.ProcessItem, WeakAddressOf Self.ProcessHandler
-		    Dim count As Integer = Archive.Count
-		    ProgressBar1.Maximum = count - 1
+		    Dim count As Integer
+		    Dim list() As RARItem = Self.Archive.ListItems
+		    count = UBound(list)
+		    ProgressBar1.Maximum = count
 		    ProgressBar1.Value = 0
-		    For i As Integer = 0 To count - 1
-		      Dim item As RARItem = Archive.Item(i)
+		    For i As Integer = 0 To count
+		      Dim item As RARItem = list(i)
 		      If item.FileName.Trim = "" Then Break
 		      If item.Directory Then
 		        Listbox1.AddFolder(item.FileName)
