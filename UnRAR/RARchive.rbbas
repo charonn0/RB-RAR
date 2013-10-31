@@ -41,6 +41,14 @@ Class RARchive
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Shared Function ExArchives() As Dictionary
+		  Static mExArchives As Dictionary
+		  If mExArchives = Nil Then mExArchives = New Dictionary
+		  Return mExArchives
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function ExtractItem(Index As Integer, SaveTo As FolderItem, Password As String = "") As Boolean
 		  ' extracts the archived file at Index to SaveTo
@@ -83,6 +91,50 @@ Class RARchive
 		    Return mLastError = 0
 		  End If
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub ExtractItemEx(Index As Integer)
+		  '' extracts the archived file at Index to SaveTo
+		  '' Pass -1 and a directory to extract all items into the directory.
+		  'If UnRAR.IsAvailable Then
+		  'mLastError = 0
+		  'Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
+		  'If mhandle <= 0 Then mLastError = mhandle * -1
+		  'If Password <> "" Then RARSetPassword(mHandle, Password)
+		  'Dim i, mmode As Integer
+		  'Do Until Me.LastError <> 0
+		  'Dim header As RARHeaderData
+		  'mLastError = RARReadHeader(mHandle, header)
+		  'If mLastError <> 0 Then Continue
+		  'Dim pitem As New RARItem(header, i, RARFile)
+		  'Dim FilePath, DirPath As MemoryBlock
+		  'If i = Index Then
+		  'mmode = RAR_EXTRACT
+		  'RaiseEvent ProcessItem(pitem, mmode, SaveTo)
+		  'FilePath = New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
+		  'FilePath.CString(0) = SaveTo.AbsolutePath + Chr(0)
+		  'ElseIf Index = -1 Then
+		  'mmode = RAR_EXTRACT
+		  'If Not SaveTo.Directory Then SaveTo = SaveTo.Parent
+		  'RaiseEvent ProcessItem(pitem, mmode, SaveTo)
+		  'DirPath = New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
+		  'DirPath.CString(0) = SaveTo.AbsolutePath + Chr(0)
+		  'Else
+		  'mmode = RAR_SKIP
+		  'RaiseEvent ProcessItem(pitem, mmode, SaveTo)
+		  'End If
+		  'If FilePath = Nil Then FilePath = ""
+		  'If DirPath = Nil Then DirPath = ""
+		  'mLastError = RARProcessFile(mhandle, mmode, DirPath, FilePath)
+		  '
+		  'i = i + 1
+		  'Loop
+		  'CloseArchive(mHandle)
+		  'If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		  'Return mLastError = 0
+		  'End If
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -143,6 +195,62 @@ Class RARchive
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Shared Function RARCallbackHandler(msg As UInt32, UserData As Ptr, P1 As Ptr, P2 As Ptr) As Integer
+		  #pragma X86CallingConvention StdCall
+		  Dim mb As MemoryBlock = UserData
+		  Dim s As String = mb.CString(0)
+		  If ExArchives.HasKey(s) Then
+		    Dim d As Dictionary = ExArchives.Value(s)
+		    Dim a As RARchive = d.Value("Reference")
+		    Return a.RAREventHandler(msg, P1, P2)
+		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function RAREventHandler(msg As UInt32, P1 As Ptr, P2 As Ptr) As Integer
+		  Dim d As Dictionary = ExArchives.Lookup(RARFile.AbsolutePath, Nil)
+		  If d <> Nil Then
+		    Dim mhandle As Integer = d.Value("Handle")
+		    
+		    Select Case msg
+		    Case UCM_CHANGEVOLUME
+		      If P2.UInt32(0) = RAR_VOL_ASK Then
+		        Dim path As String = P1.CString(0)
+		        Dim f As FolderItem = GetFolderItem(path)
+		        If RaiseEvent ChangeVolume(f) Then
+		          P1.CString(0) = f.AbsolutePath + Chr(0)
+		          Return 1
+		        End If
+		      ElseIf P2.UInt32(0) = RAR_VOL_NOTIFY Then
+		        Return 1
+		      End If
+		      
+		    Case UCM_PROCESSDATA
+		      Dim mb As MemoryBlock = P1.CString(0)
+		      Dim bs As New BinaryStream(mb)
+		      Dim h As RARHeaderDataEx
+		      mLastError = UnRAR.RARReadHeaderEx(mHandle, h)
+		      If RaiseEvent ProcessData(bs, bs.Length, New RARItemEx(h, mIndex)) Then
+		        Return 1
+		      End If
+		      
+		    Case UCM_NEEDPASSWORD
+		      Dim pw As String = RaiseEvent PasswordPrompt()
+		      If pw.Trim <> "" Then
+		        pw = ConvertEncoding(pw, Encodings.ASCII)
+		        P1.CString(0) = pw + Chr(0)
+		        P2.UInt32(0) = pw.Len
+		        Return 1
+		      End If
+		      
+		    End Select
+		    
+		    Return -1
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function RARFile() As FolderItem
 		  Return mRARFile
@@ -181,6 +289,10 @@ Class RARchive
 		End Function
 	#tag EndMethod
 
+
+	#tag Hook, Flags = &h0
+		Event ChangeVolume(ByRef NextVolume As FolderItem) As Boolean
+	#tag EndHook
 
 	#tag Hook, Flags = &h0
 		Event ProcessItem(Item As RARItem, Operation As Integer, ByRef ExtractTo As FolderItem)

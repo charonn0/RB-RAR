@@ -260,6 +260,8 @@ End
 
 	#tag Method, Flags = &h0
 		Sub ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer, ByRef SaveTo As FolderItem)
+		  #pragma Unused Sender
+		  #pragma Unused SaveTo
 		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
 		  ProgressBar1.Value = Item.Index
 		End Sub
