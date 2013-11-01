@@ -239,27 +239,10 @@ End
 #tag EndWindow
 
 #tag WindowCode
-	#tag Event
-		Sub Open()
-		  'Dim rarfile As FolderItem = GetOpenFolderItem("")
-		  'Dim myRARchive As New RARChive(rarfile)
-		  'Dim item As RARItem = myRARchive.Item(19) ' the first file is at index zero
-		  'If myRARchive.LastError = 0 Then
-		  'Dim f As FolderItem = GetSaveFolderItem("", item.FileName) ' prompt user for a save location
-		  'If f <> Nil Then
-		  'If myRARchive.ExtractItem(0, f) Then
-		  'MsgBox(item.FileName + " extracted to " + f.AbsolutePath)
-		  'Else
-		  'MsgBox("RAR error " + Str(myRARchive.LastError) + ": " + UnRAR.FormatError(myRARchive.LastError))
-		  'End If
-		  'End If
-		  'End If
-		End Sub
-	#tag EndEvent
-
-
 	#tag Method, Flags = &h0
 		Sub ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer, ByRef SaveTo As FolderItem)
+		  #pragma Unused SaveTo
+		  #pragma Unused Sender
 		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
 		  ProgressBar1.Value = Item.Index
 		End Sub
@@ -298,7 +281,9 @@ End
 	#tag Event
 		Function ContextualMenuAction(hitItem as MenuItem) As Boolean
 		  Dim item As RARItem = hitItem.Tag
-		  Dim pw As String
+		  Dim pw, msg As String
+		  Dim index As Integer
+		  
 		  If item <> Nil And item.IsEncrypted Then
 		    pw = RARPasswordWin.GetPassword(item.RARFile)
 		  ElseIf item = Nil Then
@@ -308,45 +293,39 @@ End
 		  
 		  Select Case Left(hitItem.Text, 4)
 		  Case "Extr"
+		    Dim f As FolderItem
 		    If item <> Nil Then
-		      Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
-		      If f <> Nil Then
-		        If Self.Archive.ExtractItem(item.Index, f, pw) Then
-		          MsgBox("Extracted")
-		        Else
-		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
-		        End If
-		      End If
+		      f = GetSaveFolderItem("", item.FileName)
+		      index = item.Index
 		    Else
-		      Dim f As FolderItem = SelectFolder()
-		      If f <> Nil Then
-		        If Self.Archive.ExtractItem(-1, f, pw) Then
-		          MsgBox("Extracted")
-		        Else
-		          MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
-		        End If
+		      f = SelectFolder()
+		      index = -1
+		    End If
+		    If f <> Nil Then
+		      If Archive.ExtractItem(Index, f, pw) Then
+		        msg = "Extracted"
+		      Else
+		        msg = "RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError)
 		      End If
 		    End If
 		    
-		    
 		  Case "Test"
-		    
 		    If item <> Nil Then
-		      If Self.Archive.TestItem(item.Index, pw) Then
-		        MsgBox("Test OK")
-		      Else
-		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
-		      End If
+		      index = item.Index
 		    Else
-		      If Self.Archive.TestItem(-1, pw) Then
-		        MsgBox("Test OK")
-		      Else
-		        MsgBox("RAR error " + Str(Self.Archive.LastError) + ": " + UnRAR.FormatError(Self.Archive.LastError))
-		      End If
+		      index = -1
+		    End If
+		    If Archive.TestItem(Index, pw) Then
+		      msg = "Test OK"
+		    Else
+		      msg = "RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError)
 		    End If
 		    
 		  End Select
-		  Return True
+		  If msg.Trim <> "" Then 
+		    MsgBox(msg)
+		    Return True
+		  End If
 		End Function
 	#tag EndEvent
 	#tag Event
@@ -422,39 +401,43 @@ End
 #tag Events PushButton1
 	#tag Event
 		Sub Action()
-		  Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
-		  If rar <> Nil And rar.IsRARArchive Then
-		    Listbox1.DeleteAllRows
-		    Label1.Text = rar.AbsolutePath
-		    Self.Archive = New RARchive(rar)
-		    AddHandler Self.Archive.ProcessItem, WeakAddressOf Self.ProcessHandler
-		    Dim count As Integer
-		    Dim list() As RARItem = Self.Archive.ListItems
-		    count = UBound(list)
-		    ProgressBar1.Maximum = count
-		    ProgressBar1.Value = 0
-		    For i As Integer = 0 To count
-		      Dim item As RARItem = list(i)
-		      If item.FileName.Trim = "" Then Break
-		      If item.Directory Then
-		        Listbox1.AddFolder(item.FileName)
-		      Else
-		        Dim d, sz, p As String
-		        d = item.FileTime.SQLDateTime
-		        sz = Format(item.UnpackedSize, "###,###,###,###")
-		        p = Format(item.PackedSize * 100 / item.UnpackedSize, "#0.0#\%")
-		        Listbox1.AddRow(item.FileName, sz, p, d)
-		        Listbox1.CellTag(Listbox1.LastIndex, 1) = item.UnpackedSize
-		        Listbox1.CellTag(Listbox1.LastIndex, 2) = item.PackedSize * 100 / item.UnpackedSize
-		      End If
-		      Listbox1.RowTag(Listbox1.LastIndex) = item
-		    Next
-		    Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
+		  If UnRAR.IsAvailable Then
+		    Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
+		    If rar <> Nil And rar.IsRARArchive Then
+		      Listbox1.DeleteAllRows
+		      Label1.Text = rar.AbsolutePath
+		      Archive = New RARchive(rar)
+		      AddHandler Archive.ProcessItem, WeakAddressOf Self.ProcessHandler
+		      Dim count As Integer
+		      Dim list() As RARItem = Archive.ListItems
+		      count = UBound(list)
+		      ProgressBar1.Maximum = count
+		      ProgressBar1.Value = 0
+		      For i As Integer = 0 To count
+		        Dim item As RARItem = list(i)
+		        If item.FileName.Trim = "" Then Break
+		        If item.Directory Then
+		          Listbox1.AddFolder(item.FileName)
+		        Else
+		          Dim d, sz, p As String
+		          d = item.FileTime.SQLDateTime
+		          sz = Format(item.UnpackedSize, "###,###,###,###")
+		          p = Format(item.PackedSize * 100 / item.UnpackedSize, "#0.0#\%")
+		          Listbox1.AddRow(item.FileName, sz, p, d)
+		          Listbox1.CellTag(Listbox1.LastIndex, 1) = item.UnpackedSize
+		          Listbox1.CellTag(Listbox1.LastIndex, 2) = item.PackedSize * 100 / item.UnpackedSize
+		        End If
+		        Listbox1.RowTag(Listbox1.LastIndex) = item
+		      Next
+		      Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
+		    End If
+		  Else
+		    MsgBox(UnRAR.FormatError(UnRAR.ErrorRARUnavailable))
 		  End If
 		  
 		Exception
-		  If Self.Archive.LastError <> 0 Then
-		    MsgBox("RAR error: " + Str(Self.Archive.LastError))
+		  If Archive <> Nil And Archive.LastError <> 0 Then
+		    MsgBox("RAR error: " + Str(Archive.LastError))
 		  End If
 		End Sub
 	#tag EndEvent

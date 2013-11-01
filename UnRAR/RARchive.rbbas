@@ -23,6 +23,8 @@ Class RARchive
 		    Dim sz As Integer = data.CommentSize
 		    CloseArchive(mHandle)
 		    Return comment.StringValue(0, sz).Trim
+		  Else 
+		    mLastError = ErrorRARUnavailable
 		  End If
 		End Function
 	#tag EndMethod
@@ -80,8 +82,10 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
-		    Return mLastError = 0
+		  Else
+		    mLastError = ErrorRARUnavailable
 		  End If
+		  Return mLastError = 0
 		End Function
 	#tag EndMethod
 
@@ -108,6 +112,8 @@ Class RARchive
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return ritem
+		  Else
+		    mLastError = ErrorRARUnavailable
 		  End If
 		End Function
 	#tag EndMethod
@@ -139,6 +145,8 @@ Class RARchive
 		    CloseArchive(mHandle)
 		    If Me.LastError = ErrorEndArchive Then mLastError = 0 ' not an error
 		    Return items
+		  Else
+		    mLastError = ErrorRARUnavailable
 		  End If
 		End Function
 	#tag EndMethod
@@ -177,6 +185,8 @@ Class RARchive
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
 		    Return mLastError = 0
+		  Else
+		    mLastError = ErrorRARUnavailable
 		  End If
 		End Function
 	#tag EndMethod
