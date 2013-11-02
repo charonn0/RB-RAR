@@ -23,7 +23,7 @@ Class RARchive
 		    Dim sz As Integer = data.CommentSize
 		    CloseArchive(mHandle)
 		    Return comment.StringValue(0, sz).Trim
-		  Else 
+		  Else
 		    mLastError = ErrorRARUnavailable
 		  End If
 		End Function
@@ -47,11 +47,17 @@ Class RARchive
 		Function ExtractItem(Index As Integer, SaveTo As FolderItem, Password As String = "") As Boolean
 		  ' extracts the archived file at Index to SaveTo
 		  ' Pass -1 and a directory to extract all items into the directory.
+		  
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    If mhandle <= 0 Then mLastError = mhandle * -1
-		    If Password <> "" Then RARSetPassword(mHandle, Password)
+		    ' >0 is a valid handle, <0 is a RAR error *-1
+		    If mhandle <= 0 Then
+		      mLastError = mhandle * -1
+		    ElseIf Password <> "" Then
+		      RARSetPassword(mHandle, Password)
+		    End If
+		    
 		    Dim i, mmode As Integer
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
@@ -59,6 +65,7 @@ Class RARchive
 		      If mLastError <> 0 Then Continue
 		      Dim pitem As New RARItem(header, i, RARFile)
 		      Dim FilePath, DirPath As MemoryBlock
+		      
 		      If i = Index Then
 		        mmode = RAR_EXTRACT
 		        RaiseEvent ProcessItem(pitem, mmode, SaveTo)
@@ -94,6 +101,7 @@ Class RARchive
 		  ' Retrieves the header for a single item
 		  If UnRAR.IsAvailable Then
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
+		    ' >0 is a valid handle, <0 is a RAR error *-1
 		    If mhandle < 0 Then mLastError = mhandle * -1
 		    Dim header As RARHeaderData
 		    Dim ritem As RARItem
@@ -131,6 +139,7 @@ Class RARchive
 		    Dim items() As RARItem
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
+		    ' >0 is a valid handle, <0 is a RAR error *-1
 		    If mhandle <= 0 Then mLastError = mhandle * -1
 		    Dim count As Integer
 		    Do Until Me.LastError <> 0
@@ -164,8 +173,13 @@ Class RARchive
 		  If UnRAR.IsAvailable Then
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		    If mhandle <= 0 Then mLastError = mhandle * -1
-		    If Password <> "" Then RARSetPassword(mHandle, Password)
+		    ' >0 is a valid handle, <0 is a RAR error *-1
+		    If mhandle <= 0 Then 
+		      mLastError = mhandle * -1
+		    ElseIf Password <> "" Then 
+		      RARSetPassword(mHandle, Password)
+		    End If
+		    
 		    Dim i, mmode As Integer
 		    Do Until Me.LastError <> 0
 		      Dim header As RARHeaderData
