@@ -88,7 +88,14 @@ Class RARchive
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		    If Me.LastError = UnRAR.ErrorEndArchive Then
+		      If i > Index And Index >= 0 Then
+		        Dim err As New OutOfBoundsException
+		        err.Message = "RAR archive doesn't contain that index."
+		        Raise err
+		      End If
+		      mLastError = 0
+		    End If
 		  Else
 		    mLastError = ErrorRARUnavailable
 		  End If
@@ -118,7 +125,14 @@ Class RARchive
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		    If Me.LastError = UnRAR.ErrorEndArchive Then 
+		      If i > Index And Index >= 0 Then 
+		        Dim err As New OutOfBoundsException
+		        err.Message = "RAR archive doesn't contain that index."
+		        Raise err
+		      End If
+		      mLastError = 0
+		    End If
 		    Return ritem
 		  Else
 		    mLastError = ErrorRARUnavailable
@@ -174,9 +188,9 @@ Class RARchive
 		    mLastError = 0
 		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_EXTRACT)
 		    ' >0 is a valid handle, <0 is a RAR error *-1
-		    If mhandle <= 0 Then 
+		    If mhandle <= 0 Then
 		      mLastError = mhandle * -1
-		    ElseIf Password <> "" Then 
+		    ElseIf Password <> "" Then
 		      RARSetPassword(mHandle, Password)
 		    End If
 		    
@@ -197,7 +211,14 @@ Class RARchive
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then mLastError = 0
+		    If Me.LastError = UnRAR.ErrorEndArchive Then
+		      If i > Index And Index >= 0 Then
+		        Dim err As New OutOfBoundsException
+		        err.Message = "RAR archive doesn't contain that index."
+		        Raise err
+		      End If
+		      mLastError = 0
+		    End If
 		    Return mLastError = 0
 		  Else
 		    mLastError = ErrorRARUnavailable
