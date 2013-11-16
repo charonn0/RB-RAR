@@ -1,7 +1,7 @@
 #tag Module
 Protected Module UnRAR
-	#tag Method, Flags = &h1
-		Protected Sub CloseArchive(RARHandle As Integer)
+	#tag Method, Flags = &h21
+		Private Sub CloseArchive(RARHandle As Integer)
 		  If UnRAR.IsAvailable And RARHandle > 0 Then
 		    Call RARCloseArchive(RARHandle)
 		  End If
@@ -63,8 +63,8 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
+	#tag Method, Flags = &h21
+		Private Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
 		  If UnRAR.IsAvailable Then
 		    Dim mHandle, err As Integer
 		    Dim mb As New MemoryBlock(260 * 2)
@@ -83,28 +83,28 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARCloseArchive Lib "UnRAR" (Handle As Integer) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Function RARGetDllVersion Lib "UnRAR" () As Integer
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARGetDllVersion Lib "UnRAR" () As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Function RAROpenArchive Lib "UnRAR" (ByRef Data As RAROpenArchiveData) As Integer
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RAROpenArchive Lib "UnRAR" (ByRef Data As RAROpenArchiveData) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Function RARReadHeader Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderData) As Integer
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARReadHeader Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderData) As Integer
 	#tag EndExternalMethod
 
-	#tag ExternalMethod, Flags = &h1
-		Protected Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
 	#tag EndExternalMethod
 
 	#tag Method, Flags = &h1
@@ -116,31 +116,31 @@ Protected Module UnRAR
 	#tag EndMethod
 
 
-	#tag Constant, Name = ArchiveFlag_AuthenticityInfo, Type = Double, Dynamic = False, Default = \"&h020", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_AuthenticityInfo, Type = Double, Dynamic = False, Default = \"&h020", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_Comment, Type = Double, Dynamic = False, Default = \"&h002", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_Comment, Type = Double, Dynamic = False, Default = \"&h002", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_EncryptedNames, Type = Double, Dynamic = False, Default = \"&h080", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_EncryptedNames, Type = Double, Dynamic = False, Default = \"&h080", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_FirstVolume, Type = Double, Dynamic = False, Default = \"&h100", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_FirstVolume, Type = Double, Dynamic = False, Default = \"&h100", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_Locked, Type = Double, Dynamic = False, Default = \"&h004", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_Locked, Type = Double, Dynamic = False, Default = \"&h004", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_NewNamingScheme, Type = Double, Dynamic = False, Default = \"&h010", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_NewNamingScheme, Type = Double, Dynamic = False, Default = \"&h010", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_RecoveryRecord, Type = Double, Dynamic = False, Default = \"&h040", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_RecoveryRecord, Type = Double, Dynamic = False, Default = \"&h040", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_Solid, Type = Double, Dynamic = False, Default = \"&h008", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_Solid, Type = Double, Dynamic = False, Default = \"&h008", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ArchiveFlag_Volume, Type = Double, Dynamic = False, Default = \"&h001", Scope = Protected
+	#tag Constant, Name = ArchiveFlag_Volume, Type = Double, Dynamic = False, Default = \"&h001", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = ErrorBadArchive, Type = Double, Dynamic = False, Default = \"13", Scope = Protected
@@ -185,59 +185,59 @@ Protected Module UnRAR
 	#tag Constant, Name = ErrorUnknownFormat, Type = Double, Dynamic = False, Default = \"14", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Protected
+	#tag Constant, Name = ItemFlag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Protected
+	#tag Constant, Name = ItemFlag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Protected
+	#tag Constant, Name = ItemFlag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Protected
+	#tag Constant, Name = ItemFlag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Protected
+	#tag Constant, Name = ItemFlag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = ItemFlag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Protected
+	#tag Constant, Name = ItemFlag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Protected
+	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_EXTRACT, Type = Double, Dynamic = False, Default = \"2", Scope = Protected
+	#tag Constant, Name = RAR_EXTRACT, Type = Double, Dynamic = False, Default = \"2", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_OM_EXTRACT, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
+	#tag Constant, Name = RAR_OM_EXTRACT, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_OM_LIST, Type = Double, Dynamic = False, Default = \"0", Scope = Protected
+	#tag Constant, Name = RAR_OM_LIST, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_SKIP, Type = Double, Dynamic = False, Default = \"0", Scope = Protected
+	#tag Constant, Name = RAR_SKIP, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_TEST, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
+	#tag Constant, Name = RAR_TEST, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_VOL_ASK, Type = Double, Dynamic = False, Default = \"0", Scope = Protected
+	#tag Constant, Name = RAR_VOL_ASK, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_VOL_NOTIFY, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
+	#tag Constant, Name = RAR_VOL_NOTIFY, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = UCM_CHANGEVOLUME, Type = Double, Dynamic = False, Default = \"0", Scope = Protected
+	#tag Constant, Name = UCM_CHANGEVOLUME, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = UCM_NEEDPASSWORD, Type = Double, Dynamic = False, Default = \"2", Scope = Protected
+	#tag Constant, Name = UCM_NEEDPASSWORD, Type = Double, Dynamic = False, Default = \"2", Scope = Private
 	#tag EndConstant
 
-	#tag Constant, Name = UCM_PROCESSDATA, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
+	#tag Constant, Name = UCM_PROCESSDATA, Type = Double, Dynamic = False, Default = \"1", Scope = Private
 	#tag EndConstant
 
 
-	#tag Structure, Name = RARHeaderData, Flags = &h1
+	#tag Structure, Name = RARHeaderData, Flags = &h21
 		ArchiveName As CString*260
 		  FileName As CString*260
 		  Flags As UInt32
@@ -256,7 +256,7 @@ Protected Module UnRAR
 		CommentState As UInt32
 	#tag EndStructure
 
-	#tag Structure, Name = RAROpenArchiveData, Flags = &h1
+	#tag Structure, Name = RAROpenArchiveData, Flags = &h21
 		AchiveName As Ptr
 		  OpenMode As UInt32
 		  OpenResult As UInt32
@@ -267,7 +267,7 @@ Protected Module UnRAR
 	#tag EndStructure
 
 
-	#tag Enum, Name = PackingMethods, Type = Integer, Flags = &h0
+	#tag Enum, Name = PackingMethods, Type = Integer, Flags = &h1
 		Store=&h30
 		  Fastest=&h31
 		  Fast=&h32
