@@ -89,9 +89,9 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i > Index And Index >= 0 Then
+		      If i < Index Then
 		        Dim err As New OutOfBoundsException
-		        err.Message = "RAR archive doesn't contain that index."
+		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
 		      End If
 		      mLastError = 0
@@ -125,10 +125,10 @@ Class RARchive
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then 
-		      If i > Index And Index >= 0 Then 
+		    If Me.LastError = UnRAR.ErrorEndArchive Then
+		      If i < Index Then
 		        Dim err As New OutOfBoundsException
-		        err.Message = "RAR archive doesn't contain that index."
+		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
 		      End If
 		      mLastError = 0
@@ -212,9 +212,9 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i > Index And Index >= 0 Then
+		      If i < Index Then
 		        Dim err As New OutOfBoundsException
-		        err.Message = "RAR archive doesn't contain that index."
+		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
 		      End If
 		      mLastError = 0
