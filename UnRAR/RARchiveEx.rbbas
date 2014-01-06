@@ -11,6 +11,7 @@ Class RARchiveEx
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Password As String = "")
+		  Break ' This class doesn't work yet 
 		  mRARFile = RARFile
 		  
 		  If UnRAR.IsAvailableEx Then

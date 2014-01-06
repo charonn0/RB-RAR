@@ -225,22 +225,27 @@ Class RARchive
 
 	#tag Note, Name = About this class
 		This class represents a RAR archive. Pass the RAR as a FolderItem to the class constructor. To access
-		files inside the archive call the ExtractItem method.
+		files inside the archive call the ExtractItem method. 
 		
-		To retreive metadata for a particular item, call the Item method. The Item method returns a RARItem 
+		This class can access archives with encrypted file data but not archives with encrypted file names.
+		
+		To retrieve metadata for a particular item, call the Item method. The Item method returns a RARItem 
 		for the archived file at the specified Index.
 		
 		To test file(s), call TestItem.
 		
-		Indices passed to Item, ExtractItem, and TestItem are zero-based: they run from 0 to RARchive.Count-1.
-		Pass -1 as the Index to operate on all items in the archive.
+		Indices passed to RARchive.Item, RARchive.ExtractItem, and RARchive.TestItem are zero-based: they run from 0 
+		to RARchive.Count-1. Pass -1 as the Index to operate on all items in the archive. Use RARchive.ListItems() instead 
+		of RARchive.Item(-1) or RARchive.Item() in a loop. 
+		
+		Performance optimizations appropriate for FolderItem.Item are equally effective with RARchive.Item, 
+		RARchive.ExtractItem, and RARchive.TestItem
 		
 		The Comment method returns the archive comment, if any.
 		
 		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
-		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.
+		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.9728027226
 		
-		ExtractItem and TestItem will raise the ProcessItem event for each item in the archive.
 	#tag EndNote
 
 
