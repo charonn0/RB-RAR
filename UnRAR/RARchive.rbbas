@@ -9,7 +9,7 @@ Class RARchive
 		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
 		    path.CString(0) = RARFile.AbsolutePath
 		    Dim mb As New MemoryBlock(260 * 2)
-		    data.AchiveName = path
+		    data.ArchiveName = path
 		    data.OpenMode = UnRAR.RAR_OM_EXTRACT
 		    data.CommentBufferSize = mb.Size
 		    data.Comments = mb
@@ -63,23 +63,20 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      Dim pitem As New RARItem(header, i, RARFile)
+		      'Dim pitem As New RARItem(header, i, RARFile)
 		      Dim FilePath, DirPath As MemoryBlock
 		      
 		      If i = Index Then
 		        mmode = RAR_EXTRACT
-		        RaiseEvent ProcessItem(pitem, mmode, SaveTo)
 		        FilePath = New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
 		        FilePath.CString(0) = SaveTo.AbsolutePath + Chr(0)
 		      ElseIf Index = -1 Then
 		        mmode = RAR_EXTRACT
 		        If Not SaveTo.Directory Then SaveTo = SaveTo.Parent
-		        RaiseEvent ProcessItem(pitem, mmode, SaveTo)
 		        DirPath = New MemoryBlock(SaveTo.AbsolutePath.LenB * 2)
 		        DirPath.CString(0) = SaveTo.AbsolutePath + Chr(0)
 		      Else
 		        mmode = RAR_SKIP
-		        RaiseEvent ProcessItem(pitem, mmode, SaveTo)
 		      End If
 		      If FilePath = Nil Then FilePath = ""
 		      If DirPath = Nil Then DirPath = ""
@@ -199,14 +196,13 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      Dim pitem As New RARItem(header, i, RARFile)
-		      Dim f As FolderItem
+		      'Dim pitem As New RARItem(header, i, RARFile)
+		      'Dim f As FolderItem
 		      If i = Index Or Index = -1 Then
 		        mmode = RAR_TEST
 		      Else
 		        mmode = RAR_SKIP
 		      End If
-		      RaiseEvent ProcessItem(pitem, mmode, f)
 		      mLastError = RARProcessFile(mhandle, mmode, Nil, Nil)
 		      i = i + 1
 		    Loop
@@ -225,11 +221,6 @@ Class RARchive
 		  End If
 		End Function
 	#tag EndMethod
-
-
-	#tag Hook, Flags = &h0
-		Event ProcessItem(Item As RARItem, Operation As Integer, ByRef ExtractTo As FolderItem)
-	#tag EndHook
 
 
 	#tag Note, Name = About this class

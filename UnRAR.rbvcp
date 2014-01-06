@@ -7,6 +7,7 @@ BuildSteps=Build Automation;Build Automation.rbbas;&h4B100FFF;&h0;false
 Module=UnRAR;UnRAR/UnRAR.rbbas;&h6C506FFF;&h0;false
 Class=RARchive;UnRAR/RARchive.rbbas;&h50626FFF;&h6C506FFF;false
 Class=RARItem;UnRAR/RARItem.rbbas;&h100C6FFF;&h6C506FFF;false
+Class=RARchiveEx;UnRAR/RARchiveEx.rbbas;&h6953E7FF;&h6C506FFF;false
 FileTypeSet=FileTypes1;FileTypes1.rbbas;&h6FE187FF;&h0;false
 Window=RARPasswordWin;RARPasswordWin.rbfrm;&h28232FFF;&h0;false
 DefaultWindow=Window1

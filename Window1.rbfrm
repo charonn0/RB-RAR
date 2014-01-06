@@ -365,8 +365,8 @@ End
 #tag WindowCode
 	#tag Method, Flags = &h0
 		Sub ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer, ByRef SaveTo As FolderItem)
-		  #pragma Unused SaveTo
 		  #pragma Unused Sender
+		  #pragma Unused SaveTo
 		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
 		  ProgressBar1.Value = Item.Index
 		End Sub
@@ -473,7 +473,6 @@ End
 		      ArchList.DeleteAllRows
 		      ArchivePath.Text = rar.AbsolutePath
 		      Archive = New RARchive(rar)
-		      AddHandler Archive.ProcessItem, WeakAddressOf Self.ProcessHandler
 		      Dim count As Integer
 		      Dim list() As RARItem = Archive.ListItems
 		      count = UBound(list)

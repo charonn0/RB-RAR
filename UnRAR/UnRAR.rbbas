@@ -8,6 +8,31 @@ Protected Module UnRAR
 		End Sub
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function CRC32(Extends source As MemoryBlock) As Integer
+		  Const CRCpolynomial = &hEDB88320
+		  Dim crc, t as Integer
+		  Dim strCode as String
+		  strCode = source.StringValue(0, source.Size)
+		  crc = &hffffffff
+		  Dim char As String
+		  
+		  For x As Integer = 1 To LenB(strcode)
+		    char = Midb(strcode, x, 1)
+		    t = (crc And &hFF) Xor AscB(char)
+		    For b As Integer = 0 To 7
+		      If((t And &h1) = &h1) Then
+		        t = bitwise.ShiftRight(t, 1, 32) Xor CRCpolynomial
+		      Else
+		        t = bitwise.ShiftRight(t, 1, 32)
+		      End If
+		    next
+		    crc = Bitwise.ShiftRight(crc, 8, 32) Xor t
+		  Next
+		  Return (crc Xor &hFFFFFFFF)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
@@ -50,6 +75,12 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h1
+		Protected Function IsAvailableEx() As Boolean
+		  Return System.IsFunctionAvailable("RARProcessFileW", "UnRAR")
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0
 		Function IsRARArchive(Extends Arch As FolderItem) As Boolean
 		  Dim bs As BinaryStream = BinaryStream.Open(Arch)
@@ -73,7 +104,7 @@ Protected Module UnRAR
 		    Dim data As RAROpenArchiveData
 		    data.CommentBufferSize = mb.Size
 		    data.Comments = mb
-		    data.AchiveName = path
+		    data.ArchiveName = path
 		    data.OpenMode = mode
 		    mHandle = UnRAR.RAROpenArchive(data)
 		    err = data.OpenResult
@@ -96,11 +127,23 @@ Protected Module UnRAR
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RAROpenArchiveEx Lib "UnRAR" (ByRef Data As RAROpenArchiveDataEx) As Integer
+	#tag EndExternalMethod
+
+	#tag ExternalMethod, Flags = &h21
 		Private Soft Declare Function RARProcessFile Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARProcessFileW Lib "UnRAR" (Handle As Integer, Operation As Integer, Desintation As CString, DestName As CString) As Integer
+	#tag EndExternalMethod
+
+	#tag ExternalMethod, Flags = &h21
 		Private Soft Declare Function RARReadHeader Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderData) As Integer
+	#tag EndExternalMethod
+
+	#tag ExternalMethod, Flags = &h21
+		Private Soft Declare Function RARReadHeaderEx Lib "UnRAR" (Handle As Integer, ByRef HeaderData As RARHeaderDataEx) As Integer
 	#tag EndExternalMethod
 
 	#tag ExternalMethod, Flags = &h21
@@ -230,7 +273,13 @@ Protected Module UnRAR
 	#tag Constant, Name = UCM_CHANGEVOLUME, Type = Double, Dynamic = False, Default = \"0", Scope = Private
 	#tag EndConstant
 
+	#tag Constant, Name = UCM_CHANGEVOLUMEW, Type = Double, Dynamic = False, Default = \"3", Scope = Private
+	#tag EndConstant
+
 	#tag Constant, Name = UCM_NEEDPASSWORD, Type = Double, Dynamic = False, Default = \"2", Scope = Private
+	#tag EndConstant
+
+	#tag Constant, Name = UCM_NEEDPASSWORDW, Type = Double, Dynamic = False, Default = \"4", Scope = Private
 	#tag EndConstant
 
 	#tag Constant, Name = UCM_PROCESSDATA, Type = Double, Dynamic = False, Default = \"1", Scope = Private
@@ -256,14 +305,54 @@ Protected Module UnRAR
 		CommentState As UInt32
 	#tag EndStructure
 
+	#tag Structure, Name = RARHeaderDataEx, Flags = &h21
+		ArchiveName As String*1024
+		  ArchiveNameW As String*1024
+		  FileName As String*1024
+		  FileNameW As String*1024
+		  Flags As UInt32
+		  PackedSize As UInt32
+		  UnpackedSize As UInt32
+		  HostOS As UInt32
+		  FileCRC As UInt32
+		  FileTime As UInt16
+		  FileDate As UInt16
+		  UnpVer As UInt32
+		  Method As UInt32
+		  FileAttr As UInt32
+		  CommentBuffer As Ptr
+		  CommentBufferSize As UInt32
+		  CommentSize As UInt32
+		  CommentState As UInt32
+		  DictSize As UInt32
+		  HashType As UInt32
+		  Hash As String*32
+		Reserved As String*1014
+	#tag EndStructure
+
 	#tag Structure, Name = RAROpenArchiveData, Flags = &h21
-		AchiveName As Ptr
+		ArchiveName As Ptr
 		  OpenMode As UInt32
 		  OpenResult As UInt32
 		  Comments As Ptr
 		  CommentBufferSize As UInt32
 		  CommentSize As UInt32
 		CommentState As UInt32
+	#tag EndStructure
+
+	#tag Structure, Name = RAROpenArchiveDataEx, Flags = &h21
+		ArchiveName As Ptr
+		  ArchiveNameW As Ptr
+		  OpenMode As UInt32
+		  OpenResult As UInt32
+		  Comments As Ptr
+		  CommentBufferSize As UInt32
+		  CommentSize As UInt32
+		  CommentState As UInt32
+		  Flags As UInt32
+		  Callback As Ptr
+		  UserData As Ptr
+		Reserved As Ptr
 	#tag EndStructure
 
 
