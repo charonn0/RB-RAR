@@ -364,12 +364,10 @@ End
 
 #tag WindowCode
 	#tag Method, Flags = &h0
-		Sub ProcessHandler(Sender As RARchive, Item As RARItem, Operation As Integer, ByRef SaveTo As FolderItem)
+		Function ProgressHandler(Sender As RARchive, NextItem As RARItem) As Boolean
 		  #pragma Unused Sender
-		  #pragma Unused SaveTo
-		  System.DebugLog(item.FileName + " processed in mode: " + Str(Operation))
-		  ProgressBar1.Value = Item.Index
-		End Sub
+		  ProgressBar1.Value = NextItem.Index
+		End Function
 	#tag EndMethod
 
 
@@ -473,6 +471,7 @@ End
 		      ArchList.DeleteAllRows
 		      ArchivePath.Text = rar.AbsolutePath
 		      Archive = New RARchive(rar)
+		      AddHandler Archive.OperationProgress, WeakAddressOf Self.ProgressHandler
 		      Dim count As Integer
 		      Dim list() As RARItem = Archive.ListItems
 		      count = UBound(list)
@@ -499,6 +498,7 @@ End
 		      ExtractItem.Enabled = False
 		      TestAll.Enabled = True
 		      TestItem.Enabled = False
+		      ProgressBar1.Maximum = ArchList.ListCount - 1
 		    End If
 		  Else
 		    MsgBox(UnRAR.FormatError(UnRAR.ErrorRARUnavailable))

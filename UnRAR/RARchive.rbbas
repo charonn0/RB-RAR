@@ -63,7 +63,7 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      'Dim pitem As New RARItem(header, i, RARFile)
+		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then Exit Do ' quit early
 		      Dim FilePath, DirPath As MemoryBlock
 		      
 		      If i = Index Then
@@ -81,7 +81,7 @@ Class RARchive
 		      If FilePath = Nil Then FilePath = ""
 		      If DirPath = Nil Then DirPath = ""
 		      mLastError = RARProcessFile(mhandle, mmode, DirPath, FilePath)
-		      
+		      If i = Index Then Exit Do
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
@@ -115,10 +115,10 @@ Class RARchive
 		      mLastError = RARReadHeader(mHandle, header)
 		      If Index = i And mLastError = 0 Then
 		        ritem = New RARItem(header, i, Me.RARFile)
-		        Exit Do
 		      ElseIf mLastError = 0 Then
 		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
 		      End If
+		      If i = Index Then Exit Do
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
@@ -196,14 +196,14 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      'Dim pitem As New RARItem(header, i, RARFile)
-		      'Dim f As FolderItem
+		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then Exit Do ' quit early
 		      If i = Index Or Index = -1 Then
 		        mmode = RAR_TEST
 		      Else
 		        mmode = RAR_SKIP
 		      End If
 		      mLastError = RARProcessFile(mhandle, mmode, Nil, Nil)
+		      If i = Index Then Exit Do
 		      i = i + 1
 		    Loop
 		    CloseArchive(mHandle)
@@ -223,6 +223,11 @@ Class RARchive
 	#tag EndMethod
 
 
+	#tag Hook, Flags = &h0
+		Event OperationProgress(NextItem As RARItem) As Boolean
+	#tag EndHook
+
+
 	#tag Note, Name = About this class
 		This class represents a RAR archive. Pass the RAR as a FolderItem to the class constructor. To access
 		files inside the archive call the ExtractItem method. 
@@ -238,13 +243,18 @@ Class RARchive
 		to RARchive.Count-1. Pass -1 as the Index to operate on all items in the archive. Use RARchive.ListItems() instead 
 		of RARchive.Item(-1) or RARchive.Item() in a loop. 
 		
+		RARchive.TestItem and RARchive.ExtractItem raise the OperationProgress event once before each file is processed.
+		Return True from the OperationProgress event to cancel any further processing.
+		
 		Performance optimizations appropriate for FolderItem.Item are equally effective with RARchive.Item, 
 		RARchive.ExtractItem, and RARchive.TestItem
 		
 		The Comment method returns the archive comment, if any.
 		
 		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
-		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.9728027226
+		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.
+		
+		
 		
 	#tag EndNote
 
