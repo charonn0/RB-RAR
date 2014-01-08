@@ -493,7 +493,7 @@ End
 		        End If
 		        ArchList.RowTag(ArchList.LastIndex) = item
 		      Next
-		      Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
+		      Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count + 1, "###,###,##0") + " items)"
 		      ExtractAll.Enabled = True
 		      ExtractItem.Enabled = False
 		      TestAll.Enabled = True
