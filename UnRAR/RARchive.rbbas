@@ -86,7 +86,7 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i < Index Then
+		      If i < Index Or Index < -1 Then
 		        Dim err As New OutOfBoundsException
 		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
@@ -123,7 +123,7 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i < Index Then
+		      If i < Index Or Index < -1 Then
 		        Dim err As New OutOfBoundsException
 		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
@@ -208,7 +208,7 @@ Class RARchive
 		    Loop
 		    CloseArchive(mHandle)
 		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i < Index Then
+		      If i < Index Or Index < -1 Then
 		        Dim err As New OutOfBoundsException
 		        err.Message = "RAR archive does not contain an entry at that index."
 		        Raise err
@@ -253,9 +253,6 @@ Class RARchive
 		
 		You can have multiple instances of the RARchive class pointing to the same RAR file. However, only one
 		instance can have the archive open (for extraction, header reading, testing, or counting) at any given moment.
-		
-		
-		
 	#tag EndNote
 
 
