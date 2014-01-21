@@ -4,6 +4,12 @@ Class RARchiveEx
 		Sub Close()
 		  If UnRAR.IsAvailable And RARHandle > 0 Then
 		    Call RARCloseArchive(RARHandle)
+		    For i As Integer = UBound(UserDatum) DownTo 0
+		      If UserDatum(i) = Me.UserData.Int32Value(0) Then
+		        UserDatum.Remove(i)
+		      End If
+		    Next
+		    ExArchives.Remove(Me.UserData)
 		  End If
 		  
 		End Sub
@@ -11,7 +17,7 @@ Class RARchiveEx
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Password As String = "")
-		  Break ' This class doesn't work yet 
+		  Break ' This class doesn't work yet
 		  mRARFile = RARFile
 		  
 		  If UnRAR.IsAvailableEx Then
@@ -24,10 +30,12 @@ Class RARchiveEx
 		    ArchiveHeader.CommentBufferSize = mb.Size
 		    ArchiveHeader.Comments = mb
 		    ArchiveHeader.Callback = AddressOf RARCallbackHandler
-		    Dim data As New MemoryBlock(4)
-		    data.Int32Value(0) = Path.CRC32
-		    ArchiveHeader.UserData = data
-		    ExArchives.Value(Path.CRC32) = New WeakRef(Me)
+		    UserData = New MemoryBlock(4)
+		    Dim ud As Integer = Microseconds
+		    UserData.Int32Value(0) = ud
+		    ArchiveHeader.UserData = UserData
+		    ExArchives.Value(ud) = New WeakRef(Me)
+		    UserDatum.Append(ud)
 		    RARHandle = UnRAR.RAROpenArchiveEx(ArchiveHeader)
 		    If RARHandle <= 0 Then
 		      mLastError = ArchiveHeader.OpenResult
@@ -182,6 +190,14 @@ Class RARchiveEx
 
 	#tag Property, Flags = &h1
 		Protected RARHandle As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private UserData As MemoryBlock
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private Shared UserDatum() As Integer
 	#tag EndProperty
 
 
