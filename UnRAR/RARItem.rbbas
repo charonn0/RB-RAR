@@ -79,7 +79,8 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function FileTime() As Date
-		  ' returns the modification date and time of the item as a Date object. Resolution is 1 second
+		  ' returns the modification date and time of the item as a Date object. 
+		  ' WinRAR stores timestamps in MS-DOS format. Resolution is 2 seconds
 		  Dim h, m, s, dom, mon, year As Integer
 		  Dim dt, tm As UInt16
 		  
@@ -90,13 +91,13 @@ Class RARItem
 		    tm = RawDataEx.FileTime
 		    dt = RawDataEx.FileDate
 		  End If
-		  
-		  h = Bitwise.ShiftRight(tm, 11)
-		  m = Bitwise.ShiftRight(tm, 5) And &h3F
+		  h = ShiftRight(tm, 11)
+		  m = ShiftRight(tm, 5) And &h3F
 		  s = (tm And &h1F) * 2
 		  dom = dt And &h1F
-		  mon = Bitwise.ShiftRight(dt, 5) And &h0F
-		  year = (Bitwise.ShiftRight(dt, 9) And &h7F) + 1980
+		  mon = ShiftRight(dt, 5) And &h0F
+		  year = (ShiftRight(dt, 9) And &h7F) + 1980
+		  
 		  Return New Date(year, mon, dom, h, m, s)
 		End Function
 	#tag EndMethod
