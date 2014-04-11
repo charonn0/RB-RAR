@@ -62,6 +62,8 @@ Protected Module UnRAR
 		    Return "Unknown archive format"
 		  Case ErrorRARUnavailable
 		    Return "UnRAR library not available"
+		  Case ErrorUserCancel
+		    Return "Operation canceled."
 		  Else
 		    Return "Unknown RAR error"
 		  End Select
@@ -226,6 +228,9 @@ Protected Module UnRAR
 	#tag EndConstant
 
 	#tag Constant, Name = ErrorUnknownFormat, Type = Double, Dynamic = False, Default = \"14", Scope = Protected
+	#tag EndConstant
+
+	#tag Constant, Name = ErrorUserCancel, Type = Double, Dynamic = False, Default = \"-1", Scope = Public
 	#tag EndConstant
 
 	#tag Constant, Name = ItemFlag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Private

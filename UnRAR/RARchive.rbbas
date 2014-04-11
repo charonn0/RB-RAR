@@ -63,7 +63,10 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then Exit Do ' quit early
+		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then 
+		        mLastError = ErrorUserCancel
+		        Exit Do ' quit early
+		      End If
 		      Dim FilePath, DirPath As MemoryBlock
 		      
 		      If i = Index Then
@@ -196,7 +199,10 @@ Class RARchive
 		      Dim header As RARHeaderData
 		      mLastError = RARReadHeader(mHandle, header)
 		      If mLastError <> 0 Then Continue
-		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then Exit Do ' quit early
+		      If RaiseEvent OperationProgress(New RARItem(header, i, RARFile)) Then
+		        mLastError = ErrorUserCancel
+		        Exit Do ' quit early
+		      End If
 		      If i = Index Or Index = -1 Then
 		        mmode = RAR_TEST
 		      Else
