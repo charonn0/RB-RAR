@@ -90,7 +90,7 @@ Protected Module UnRAR
 		  bs.Close
 		  Return israr
 		  
-		Exception err
+		Exception err As RuntimeException
 		  If err IsA ThreadEndException Or err IsA EndException Then Raise err
 		  Return False
 		End Function
