@@ -65,7 +65,7 @@ Protected Module UnRAR
 		  Case ErrorUserCancel
 		    Return "Operation canceled."
 		  Else
-		    Return "Unknown RAR error"
+		    Return "Unknown RAR error: " + Str(RARErrorNumber)
 		  End Select
 		  
 		End Function
