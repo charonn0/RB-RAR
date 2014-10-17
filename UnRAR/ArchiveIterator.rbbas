@@ -101,12 +101,13 @@ Protected Class ArchiveIterator
 		  ' >0 is a valid handle, <0 is a RAR error *-1
 		  If mhandle <= 0 Then
 		    mLastError = mhandle * -1
+		    Return
 		  ElseIf mPassword <> "" Then
 		    RARSetPassword(mHandle, mPassword)
 		  End If
 		  Dim header As RARHeaderData
 		  mLastError = RARReadHeader(mHandle, header)
-		  If mLastError = 0 Then 
+		  If mLastError = 0 Then
 		    mCurrentIndex = 0
 		    mCurrentItem = New RARItem(header, mCurrentIndex, mRARFile)
 		  End If
