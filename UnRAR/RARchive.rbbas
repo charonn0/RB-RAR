@@ -51,6 +51,11 @@ Class RARchive
 		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST, Password)
 		  
 		  Do Until rar.LastError <> 0
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
+		      mLastError = UnRAR.ErrorUserCancel
+		      Exit Do
+		    End If
+		    
 		    Dim mmode As Integer
 		    If rar.CurrentIndex = Index Then
 		      mmode = RAR_EXTRACT
@@ -59,9 +64,13 @@ Class RARchive
 		    Else
 		      mmode = RAR_SKIP
 		    End If
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then 
+		      mLastError = UnRAR.ErrorUserCancel
+		      Return False
+		    End If
 		    If Not rar.ProcessItem(mmode, SaveTo) Then
 		      mLastError = rar.LastError
-		    ElseIf rar.CurrentIndex - 1 = Index Then 
+		    ElseIf rar.CurrentIndex - 1 = Index Then
 		      Exit Do
 		    End If
 		  Loop
@@ -82,37 +91,30 @@ Class RARchive
 	#tag Method, Flags = &h0
 		Function Item(Index As Integer) As RARItem
 		  ' Retrieves the header for a single item
-		  If UnRAR.IsAvailable Then
-		    Dim mhandle As Integer = OpenArchive(RARFile, RAR_OM_LIST)
-		    ' >0 is a valid handle, <0 is a RAR error *-1
-		    If mhandle < 0 Then mLastError = mhandle * -1
-		    Dim header As RARHeaderData
-		    Dim ritem As RARItem
-		    Dim i As Integer
-		    
-		    Do Until Me.LastError <> 0
-		      mLastError = RARReadHeader(mHandle, header)
-		      If Index = i And mLastError = 0 Then
-		        ritem = New RARItem(header, i, Me.RARFile)
-		      ElseIf mLastError = 0 Then
-		        mLastError = RARProcessFile(mHandle, RAR_SKIP, Nil, Nil)
-		      End If
-		      If i = Index Then Exit Do
-		      i = i + 1
-		    Loop
-		    CloseArchive(mHandle)
-		    If Me.LastError = UnRAR.ErrorEndArchive Then
-		      If i < Index Or Index < -1 Then
-		        Dim err As New OutOfBoundsException
-		        err.Message = "RAR archive does not contain an entry at that index."
-		        Raise err
-		      End If
-		      mLastError = 0
+		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST)
+		  Do Until rar.LastError <> 0
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
+		      mLastError = UnRAR.ErrorUserCancel
+		      Exit Do
 		    End If
-		    Return ritem
-		  Else
-		    mLastError = ErrorRARUnavailable
+		    
+		    If rar.CurrentIndex = Index Then Return rar.CurrentItem
+		    If Not rar.ProcessItem(RAR_SKIP) Then
+		      mLastError = rar.LastError
+		    End If
+		  Loop
+		  
+		  If Me.LastError = UnRAR.ErrorEndArchive Then
+		    If rar.CurrentIndex < Index Or Index < -1 Then
+		      Dim err As New OutOfBoundsException
+		      err.Message = "RAR archive does not contain an entry at that index."
+		      Raise err
+		    End If
+		    mLastError = 0
 		  End If
+		  
+		  
+		  
 		End Function
 	#tag EndMethod
 
@@ -130,6 +132,10 @@ Class RARchive
 		  
 		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST)
 		  Do Until rar.LastError <> 0
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
+		      mLastError = UnRAR.ErrorUserCancel
+		      Exit Do
+		    End If
 		    items.Append(rar.CurrentItem)
 		    If Not rar.ProcessItem(RAR_SKIP) Then
 		      mLastError = rar.LastError
@@ -155,6 +161,11 @@ Class RARchive
 		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_EXTRACT, Password)
 		  
 		  Do Until rar.LastError <> 0
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
+		      mLastError = UnRAR.ErrorUserCancel
+		      Exit Do
+		    End If
+		    
 		    Dim mmode As Integer
 		    If rar.CurrentIndex = Index Then
 		      mmode = RAR_TEST
@@ -163,6 +174,7 @@ Class RARchive
 		    Else
 		      mmode = RAR_SKIP
 		    End If
+		    
 		    If Not rar.ProcessItem(mmode) Then
 		      mLastError = rar.LastError
 		    ElseIf rar.CurrentIndex - 1 = Index Then
