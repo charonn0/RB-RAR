@@ -366,7 +366,7 @@ End
 	#tag Method, Flags = &h0
 		Function ProgressHandler(Sender As RARchive, NextItem As RARItem) As Boolean
 		  #pragma Unused Sender
-		  ProgressBar1.Value = NextItem.Index
+		  ProgressBar1.Value = NextItem.Index + 1
 		End Function
 	#tag EndMethod
 
