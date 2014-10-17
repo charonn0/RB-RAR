@@ -64,10 +64,7 @@ Class RARchive
 		    Else
 		      mmode = RAR_SKIP
 		    End If
-		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
-		      mLastError = UnRAR.ErrorUserCancel
-		      Return False
-		    End If
+		    
 		    If Not rar.ProcessItem(mmode, SaveTo) Then
 		      mLastError = rar.LastError
 		    ElseIf rar.CurrentIndex - 1 = Index Then
