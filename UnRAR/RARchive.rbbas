@@ -48,7 +48,7 @@ Class RARchive
 		  ' extracts the archived file at Index to SaveTo
 		  ' Pass -1 and a directory to extract all items into the directory.
 		  
-		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST, Password)
+		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_EXTRACT, Password)
 		  
 		  Do Until rar.LastError <> 0
 		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
@@ -64,7 +64,7 @@ Class RARchive
 		    Else
 		      mmode = RAR_SKIP
 		    End If
-		    If RaiseEvent OperationProgress(rar.CurrentItem) Then 
+		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
 		      mLastError = UnRAR.ErrorUserCancel
 		      Return False
 		    End If
