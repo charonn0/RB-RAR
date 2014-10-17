@@ -1,25 +1,28 @@
 #tag Class
 Protected Class ArchiveIterator
 	#tag Method, Flags = &h0
+		Sub Close()
+		  mCurrentItem = Nil
+		  mCurrentIndex = -1
+		  If mHandle <> 0 Then
+		    CloseArchive(mHandle)
+		  End If
+		  mHandle = 0
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(ArchFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "")
 		  mRARFile = ArchFile
-		  mLastError = 0
-		  mhandle = OpenArchive(RARFile, RAR_OM_EXTRACT)
-		  ' >0 is a valid handle, <0 is a RAR error *-1
-		  If mhandle <= 0 Then
-		    mLastError = mhandle * -1
-		  ElseIf Password <> "" Then
-		    RARSetPassword(mHandle, Password)
-		  End If
-		  Dim header As RARHeaderData
-		  mLastError = RARReadHeader(mHandle, header)
+		  OpenMode = Mode
+		  mPassword = Password
+		  Me.Reset
 		  If mLastError <> 0 Then
 		    Dim err As New IOException
 		    err.ErrorNumber = mLastError
 		    err.Message = UnRAR.FormatError(mLastError)
 		    Raise err
 		  End If
-		  mCurrentItem = New RARItem(header, mCurrentIndex, ArchFile)
 		  
 		End Sub
 	#tag EndMethod
@@ -38,7 +41,7 @@ Protected Class ArchiveIterator
 
 	#tag Method, Flags = &h0
 		Sub Destructor()
-		  CloseArchive(mHandle)
+		  Me.Close
 		End Sub
 	#tag EndMethod
 
@@ -91,6 +94,26 @@ Protected Class ArchiveIterator
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Sub Reset()
+		  Me.Close
+		  mhandle = OpenArchive(RARFile, OpenMode)
+		  ' >0 is a valid handle, <0 is a RAR error *-1
+		  If mhandle <= 0 Then
+		    mLastError = mhandle * -1
+		  ElseIf mPassword <> "" Then
+		    RARSetPassword(mHandle, mPassword)
+		  End If
+		  Dim header As RARHeaderData
+		  mLastError = RARReadHeader(mHandle, header)
+		  If mLastError = 0 Then 
+		    mCurrentIndex = 0
+		    mCurrentItem = New RARItem(header, mCurrentIndex, mRARFile)
+		  End If
+		  
+		End Sub
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h1
 		Protected mCurrentIndex As Integer
@@ -109,7 +132,15 @@ Protected Class ArchiveIterator
 	#tag EndProperty
 
 	#tag Property, Flags = &h1
+		Protected mPassword As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
 		Protected mRARFile As FolderItem
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
+		Protected OpenMode As Integer
 	#tag EndProperty
 
 
