@@ -12,7 +12,7 @@ Protected Class ArchiveIterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(ArchFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "")
+		Sub Constructor(ArchFile As FolderItem, Mode As Integer, Password As String)
 		  mRARFile = ArchFile
 		  OpenMode = Mode
 		  mPassword = Password
@@ -24,6 +24,13 @@ Protected Class ArchiveIterator
 		    Raise err
 		  End If
 		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Constructor(RARHandle As Integer, ArchFile As FolderItem, Mode As Integer, Password As String)
+		  mHandle = RARHandle
+		  Me.Constructor(ArchFile, Mode, Password)
 		End Sub
 	#tag EndMethod
 

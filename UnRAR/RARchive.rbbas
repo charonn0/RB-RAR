@@ -48,7 +48,7 @@ Class RARchive
 		  ' extracts the archived file at Index to SaveTo
 		  ' Pass -1 and a directory to extract all items into the directory.
 		  
-		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_EXTRACT, Password)
+		  Dim rar As UnRAR.ArchiveIterator = UnRAR.IterateArchive(mRARFile, RAR_OM_EXTRACT, Password)
 		  
 		  Do Until rar.LastError <> 0
 		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
@@ -88,7 +88,7 @@ Class RARchive
 	#tag Method, Flags = &h0
 		Function Item(Index As Integer) As RARItem
 		  ' Retrieves the header for a single item
-		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST)
+		  Dim rar As UnRAR.ArchiveIterator = UnRAR.IterateArchive(mRARFile, RAR_OM_LIST)
 		  Do Until rar.LastError <> 0
 		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
 		      mLastError = UnRAR.ErrorUserCancel
@@ -127,7 +127,7 @@ Class RARchive
 		  Dim items() As RARItem
 		  mLastError = 0
 		  
-		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_LIST)
+		  Dim rar As UnRAR.ArchiveIterator = UnRAR.IterateArchive(mRARFile, RAR_OM_LIST, "")
 		  Do Until rar.LastError <> 0
 		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
 		      mLastError = UnRAR.ErrorUserCancel
@@ -155,7 +155,7 @@ Class RARchive
 		Function TestItem(Index As Integer, Password As String = "") As Boolean
 		  ' tests item(s) in the archive
 		  ' Pass the index of the item to test, or pass -1 to test all items.
-		  Dim rar As New UnRAR.ArchiveIterator(mRARFile, RAR_OM_EXTRACT, Password)
+		  Dim rar As UnRAR.ArchiveIterator = UnRAR.IterateArchive(mRARFile, RAR_OM_EXTRACT, Password)
 		  
 		  Do Until rar.LastError <> 0
 		    If RaiseEvent OperationProgress(rar.CurrentItem) Then
