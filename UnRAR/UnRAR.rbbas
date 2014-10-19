@@ -350,12 +350,14 @@ Protected Module UnRAR
 
 	#tag Structure, Name = RARHeaderDataEx, Flags = &h21
 		ArchiveName As String*1024
-		  ArchiveNameW As String*1024
-		  FileName As String*1024
-		  FileNameW As String*1024
+		  ArchiveNameW As WString*1024
+		  FileName As CString*1024
+		  FileNameW As WString*1024
 		  Flags As UInt32
 		  PackedSize As UInt32
+		  PackedSizeHi As UInt32
 		  UnpackedSize As UInt32
+		  UnpackedSizeHi As UInt32
 		  HostOS As UInt32
 		  FileCRC As UInt32
 		  FileTime As UInt16
