@@ -105,6 +105,12 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function IterateArchiveEx(RARFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "") As UnRAR.ArchiveIteratorEx
+		  Return New UnRAR.ArchiveIteratorEx(RARFile, Mode, Password)
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
 		  If UnRAR.IsAvailable Then
