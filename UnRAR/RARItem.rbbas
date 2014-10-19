@@ -2,13 +2,13 @@
 Class RARItem
 	#tag Method, Flags = &h0
 		Function Comment() As String
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    If RawData.CommentState = 1 Then
 		      Dim mb As MemoryBlock = RawData.CommentBuffer
 		      Return mb.StringValue(0, RawData.CommentSize)
 		    End If
 		    
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    If RawDataEx.CommentState = 1 Then
 		      Dim mb As MemoryBlock = RawDataEx.CommentBuffer
 		      Return mb.StringValue(0, RawDataEx.CommentSize)
@@ -19,6 +19,7 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Sub Constructor(Data As RARHeaderData, Index As Integer, RAR As FolderItem)
+		  IsEx = False
 		  RawData = Data
 		  RawDataEx.StringValue(TargetLittleEndian) = ""
 		  mIndex = Index
@@ -28,6 +29,7 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Sub Constructor(Data As RARHeaderDataEx, Index As Integer, RAR As FolderItem)
+		  IsEx = True
 		  RawDataEx = Data
 		  RawData.StringValue(TargetLittleEndian) = ""
 		  mIndex = Index
@@ -37,9 +39,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function CRC32() As Integer
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.FileCRC
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return RawDataEx.FileCRC
 		  End If
 		  
@@ -48,9 +50,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function Directory() As Boolean
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
 		  End If
 		  
@@ -59,9 +61,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function FileAttributes() As Integer
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.FileAttr
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return RawDataEx.FileAttr
 		  End If
 		End Function
@@ -69,25 +71,25 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function FileName() As String
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.FileName
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
-		    Return RawDataEx.FileName
+		  Else
+		    Return RawDataEx.FileNameW
 		  End If
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function FileTime() As Date
-		  ' returns the modification date and time of the item as a Date object. 
+		  ' returns the modification date and time of the item as a Date object.
 		  ' WinRAR stores timestamps in MS-DOS format. Resolution is 2 seconds
 		  Dim h, m, s, dom, mon, year As Integer
 		  Dim dt, tm As UInt16
 		  
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    tm = RawData.FileTime
 		    dt = RawData.FileDate
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    tm = RawDataEx.FileTime
 		    dt = RawDataEx.FileDate
 		  End If
@@ -104,9 +106,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function Flags() As Integer
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.Flags
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return RawDataEx.Flags
 		  End If
 		  
@@ -116,9 +118,9 @@ Class RARItem
 	#tag Method, Flags = &h0
 		Function HostOS() As String
 		  Dim os As UInt32
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    os = RawData.HostOS
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    os = RawDataEx.HostOS
 		  End If
 		  
@@ -145,9 +147,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function IsEncrypted() As Boolean
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
 		  End If
 		  
@@ -156,9 +158,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function IsSolid() As Boolean
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
 		  End If
 		End Function
@@ -166,9 +168,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function MinimumVersion() As Double
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.UnpVer / 10
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return RawDataEx.UnpVer / 10
 		  End If
 		  
@@ -186,10 +188,10 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function PackedSize() As UInt32
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.PackedSize
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
-		    Return RawDataEx.PackedSize
+		  Else
+		    Return BitOr(ShiftLeft(RawDataEx.UnpackedSizeHi, 32), RawDataEx.UnpackedSize)
 		  End If
 		  
 		End Function
@@ -197,9 +199,9 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function PackingMethod() As Integer
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.Method
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
+		  Else
 		    Return RawDataEx.Method
 		  End If
 		  
@@ -213,11 +215,11 @@ Class RARItem
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function UnpackedSize() As UInt32
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		Function UnpackedSize() As UInt64
+		  If Not IsEx Then
 		    Return RawData.UnpackedSize
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
-		    Return RawDataEx.UnpackedSize
+		  Else
+		    Return BitOr(ShiftLeft(RawDataEx.UnpackedSizeHi, 32), RawDataEx.UnpackedSize)
 		  End If
 		  
 		End Function
@@ -225,15 +227,19 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function VolumeName() As String
-		  If RawData.StringValue(TargetLittleEndian) <> "" Then
+		  If Not IsEx Then
 		    Return RawData.ArchiveName
-		  ElseIf RawDataEx.StringValue(TargetLittleEndian) <> "" Then
-		    Return RawDataEx.ArchiveNameW
+		  Else
+		    Return DefineEncoding(RawDataEx.ArchiveNameW, Encodings.UTF16)
 		  End If
 		  
 		End Function
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h21
+		Private IsEx As Boolean
+	#tag EndProperty
 
 	#tag Property, Flags = &h1
 		Protected mIndex As Integer
