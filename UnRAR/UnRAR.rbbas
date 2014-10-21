@@ -56,6 +56,8 @@ Protected Module UnRAR
 		    Return "Insufficient memory for requested operation"
 		  Case ErrorSmallBuff
 		    Return "Output buffer is too small"
+		  Case ErrorNeedPassword
+		    Return "This archive requires a password to access but no password was specified."
 		  Case ErrorUnknown
 		    Return "Unknown RAR error"
 		  Case ErrorUnknownFormat
@@ -250,7 +252,7 @@ Protected Module UnRAR
 	#tag Constant, Name = ErrorEWrite, Type = Double, Dynamic = False, Default = \"19", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = ErrorNeedPassword, Type = Double, Dynamic = False, Default = \"255", Scope = Protected
+	#tag Constant, Name = ErrorNeedPassword, Type = Double, Dynamic = False, Default = \"22", Scope = Protected
 	#tag EndConstant
 
 	#tag Constant, Name = ErrorNoMemory, Type = Double, Dynamic = False, Default = \"11", Scope = Protected
