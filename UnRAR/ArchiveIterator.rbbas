@@ -3,7 +3,7 @@ Protected Class ArchiveIterator
 	#tag Method, Flags = &h0
 		Sub Close()
 		  mCurrentItem = Nil
-		  mCurrentIndex = -1
+		  mCurrentIndex = 0
 		  If mHandle <> 0 Then
 		    CloseArchive(mHandle)
 		  End If
@@ -86,8 +86,8 @@ Protected Class ArchiveIterator
 		    Dim header As RARHeaderData
 		    mLastError = RARReadHeader(mHandle, header)
 		    If mLastError = 0 Then
-		      mCurrentItem = New RARItem(header, mCurrentIndex, RARFile)
 		      mCurrentIndex = mCurrentIndex + 1
+		      mCurrentItem = New RARItem(header, mCurrentIndex, RARFile)
 		    End If
 		  End If
 		  
