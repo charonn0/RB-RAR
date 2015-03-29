@@ -3,29 +3,9 @@ Class RARchive
 	#tag Method, Flags = &h0
 		Function Comment() As String
 		  ' Returns the archive comment, if any
-		  If UnRAR.IsAvailable Then
-		    Dim mHandle As Integer
-		    Dim data As RAROpenArchiveData
-		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
-		    path.CString(0) = RARFile.AbsolutePath
-		    Dim mb As New MemoryBlock(260 * 2)
-		    data.ArchiveName = path
-		    data.OpenMode = UnRAR.RAR_OM_EXTRACT
-		    data.CommentBufferSize = mb.Size
-		    data.Comments = mb
-		    mHandle = UnRAR.RAROpenArchive(data)
-		    If mHandle <= 0 Then
-		      mLastError = data.OpenResult
-		      CloseArchive(mHandle)
-		      Return ""
-		    End If
-		    Dim comment As MemoryBlock = data.Comments
-		    Dim sz As Integer = data.CommentSize
-		    CloseArchive(mHandle)
-		    Return comment.StringValue(0, sz).Trim
-		  Else
-		    mLastError = ErrorRARUnavailable
-		  End If
+		  Dim rar As UnRAR.ArchiveIterator
+		  rar = rar.Open(RARFile, UnRAR.RAR_OM_EXTRACT, "")
+		  Return rar.ArchiveComment
 		End Function
 	#tag EndMethod
 
