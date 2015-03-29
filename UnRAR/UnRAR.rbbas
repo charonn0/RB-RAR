@@ -1,38 +1,5 @@
 #tag Module
 Protected Module UnRAR
-	#tag Method, Flags = &h21
-		Private Sub CloseArchive(RARHandle As Integer)
-		  If UnRAR.IsAvailable And RARHandle > 0 Then
-		    Call RARCloseArchive(RARHandle)
-		  End If
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Function CRC32(Extends source As MemoryBlock) As Integer
-		  Const CRCpolynomial = &hEDB88320
-		  Dim crc, t as Integer
-		  Dim strCode as String
-		  strCode = source.StringValue(0, source.Size)
-		  crc = &hffffffff
-		  Dim char As String
-		  
-		  For x As Integer = 1 To LenB(strcode)
-		    char = Midb(strcode, x, 1)
-		    t = (crc And &hFF) Xor AscB(char)
-		    For b As Integer = 0 To 7
-		      If((t And &h1) = &h1) Then
-		        t = bitwise.ShiftRight(t, 1, 32) Xor CRCpolynomial
-		      Else
-		        t = bitwise.ShiftRight(t, 1, 32)
-		      End If
-		    next
-		    crc = Bitwise.ShiftRight(crc, 8, 32) Xor t
-		  Next
-		  Return (crc Xor &hFFFFFFFF)
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h1
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
@@ -98,32 +65,9 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Function IterateArchive(RARFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "") As UnRAR.ArchiveIterator
-		  Dim h As Integer = OpenArchive(RARFile, Mode)
-		  If h > 0 Then
-		    Return New UnRAR.ArchiveIterator(h, RARFile, Mode, Password)
-		  End If
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h21
-		Private Function OpenArchive(RARFile As FolderItem, Mode As Integer) As Integer
-		  If UnRAR.IsAvailable Then
-		    Dim mHandle, err As Integer
-		    Dim mb As New MemoryBlock(260 * 2)
-		    Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2)
-		    path.CString(0) = RARFile.AbsolutePath
-		    Dim data As RAROpenArchiveData
-		    data.CommentBufferSize = mb.Size
-		    data.Comments = mb
-		    data.ArchiveName = path
-		    data.OpenMode = mode
-		    mHandle = UnRAR.RAROpenArchive(data)
-		    err = data.OpenResult
-		    If mHandle <= 0 Then Return err * -1
-		    Return mHandle
-		  End If
+	#tag Method, Flags = &h1
+		Protected Function IterateArchive(RARFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "") As UnRAR.ArchiveIterator
+		  Return ArchiveIterator.Open(RARFile, Mode, Password)
 		End Function
 	#tag EndMethod
 
