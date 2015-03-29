@@ -37,35 +37,35 @@ Protected Module UnRAR
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
 		  Case ErrorBadArchive
-		    Return "Volume is not valid RAR archive"
+		    Return "The archive is corrupt."
 		  Case ErrorBadData
-		    Return "File CRC error"
+		    Return "The archive is encrypted or corrupt."
 		  Case ErrorEClose
-		    Return "File close error"
+		    Return "The archive could not be closed."
 		  Case ErrorECreate
-		    Return "Output file create error"
+		    Return "The output file could not be created."
 		  Case ErrorEndArchive
-		    Return "End of archive"
+		    Return "The archive contains no additional entries."
 		  Case ErrorEOpen
-		    Return "Volume open error"
+		    Return "The archive could not be opened."
 		  Case ErrorERead
-		    Return "Volume read error"
+		    Return "The archive could not be read."
 		  Case ErrorEWrite
-		    Return "Output file write error"
+		    Return "The output file could not be written."
 		  Case ErrorNoMemory
-		    Return "Insufficient memory for requested operation"
+		    Return "Out of memory!"
 		  Case ErrorSmallBuff
-		    Return "Output buffer is too small"
+		    Return "The output buffer was too small to contain the requested data."
 		  Case ErrorNeedPassword
-		    Return "This archive requires a password to access but no password was specified."
+		    Return "A password is required in order to access the archive."
 		  Case ErrorUnknown
 		    Return "Unknown RAR error"
 		  Case ErrorUnknownFormat
-		    Return "Unknown archive format"
+		    Return "The archive is of an unknown format."
 		  Case ErrorRARUnavailable
-		    Return "UnRAR library not available"
+		    Return "The UnRAR library is not installed."
 		  Case ErrorUserCancel
-		    Return "Operation canceled."
+		    Return "The operation was canceled."
 		  Else
 		    Return "Unknown RAR error: " + Str(RARErrorNumber)
 		  End Select
