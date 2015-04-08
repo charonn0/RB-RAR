@@ -85,6 +85,7 @@ Class RARchive
 		    If rar.CurrentIndex < Index Or Index < -1 Then
 		      Dim err As New OutOfBoundsException
 		      err.Message = "RAR archive does not contain an entry at that index."
+		      err.ErrorNumber = Index
 		      Raise err
 		    End If
 		    mLastError = 0

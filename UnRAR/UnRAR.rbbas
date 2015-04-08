@@ -123,7 +123,7 @@ Protected Module UnRAR
 		contact me at andrew[at]boredomsoft[dot]org
 		
 		--------------------------------------------------------------------------------
-		Copyright (c) 2013-14 Andrew Lambert
+		Copyright (c) 2013-15 Andrew Lambert
 		
 		Permission is hereby granted, free of charge, to any person obtaining a copy
 		of this software and associated documentation files (the "Software"), to deal
