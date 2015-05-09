@@ -168,7 +168,7 @@ End
 #tag WindowCode
 	#tag Method, Flags = &h0
 		Function GetPassword(Archive As FolderItem) As String
-		  Self.Title = "Enter Password for " + Archive.Name
+		  Self.Title = "Enter password for " + Archive.Name
 		  PassField.Text = ""
 		  Password = ""
 		  Me.ShowModal

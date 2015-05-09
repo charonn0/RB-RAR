@@ -10,6 +10,7 @@ Protected Class ArchiveIterator
 		Sub Close()
 		  mCurrentItem = Nil
 		  mCurrentIndex = 0
+		  mLastError = 0
 		  If mHandle <> 0 Then mLastError = RARCloseArchive(mHandle)
 		  mHandle = 0
 		End Sub
@@ -104,6 +105,7 @@ Protected Class ArchiveIterator
 		  ' directly into the file.
 		  
 		  Dim FilePath, DirPath As MemoryBlock
+		  mLastError = 0
 		  
 		  Select Case True
 		  Case ExtractPath = Nil
