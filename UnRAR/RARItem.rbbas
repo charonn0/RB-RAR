@@ -147,22 +147,14 @@ Class RARItem
 
 	#tag Method, Flags = &h0
 		Function IsEncrypted() As Boolean
-		  If Not IsEx Then
-		    Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
-		  Else
-		    Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
-		  End If
+		  Return BitAnd(Me.Flags, ItemFlag_Encrypted) = ItemFlag_Encrypted
 		  
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Function IsSolid() As Boolean
-		  If Not IsEx Then
-		    Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
-		  Else
-		    Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
-		  End If
+		  Return BitAnd(Me.Flags, ItemFlag_Solid) = ItemFlag_Solid
 		End Function
 	#tag EndMethod
 
