@@ -1,6 +1,18 @@
 #tag Class
 Protected Class Iterator
 	#tag Method, Flags = &h0
+		Function ArchiveFile() As FolderItem
+		  Return mArchFile
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub Close()
+		  If mHandle <> 0 Then mLastError = RARCloseArchive(mHandle)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Mode As Integer)
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mArchFile = RARFile
@@ -33,9 +45,9 @@ Protected Class Iterator
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Sub Destructor()
-		  If mHandle <> 0 Then mLastError = RARCloseArchive(mHandle)
+	#tag Method, Flags = &h21
+		Private Sub Destructor()
+		  Me.Close
 		End Sub
 	#tag EndMethod
 
@@ -92,7 +104,7 @@ Protected Class Iterator
 
 	#tag Method, Flags = &h0
 		Sub Reset()
-		  Me.Destructor
+		  Me.Close
 		  Me.Constructor(mArchFile, mOpenMode)
 		End Sub
 	#tag EndMethod
