@@ -1,6 +1,21 @@
 #tag Module
 Protected Module UnRAR
 	#tag Method, Flags = &h1
+		Protected Sub ExtractArchive(RARFile As FolderItem, Destination As FolderItem, Password As String = "")
+		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
+		  If Not RARFile.IsRARArchive Then Raise New UnsupportedFormatException
+		  
+		  Dim Archive As New UnRAR.IteratorEx(RARFile, RAR_OM_EXTRACT, Password)
+		  Do
+		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, Destination) Then Exit Do
+		  Loop Until Archive.LastError <> 0
+		  If Archive.LastError <> 0 And Archive.LastError <> ErrorEndArchive Then Raise New RARException(Archive.LastError)
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
 		  Case ErrorBadArchive
@@ -46,12 +61,6 @@ Protected Module UnRAR
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Function IsAvailableEx() As Boolean
-		  Return System.IsFunctionAvailable("RARProcessFileW", "UnRAR")
-		End Function
-	#tag EndMethod
-
 	#tag Method, Flags = &h0
 		Function IsRARArchive(Extends Arch As FolderItem) As Boolean
 		  Dim bs As BinaryStream = BinaryStream.Open(Arch)
@@ -62,12 +71,6 @@ Protected Module UnRAR
 		Exception err As RuntimeException
 		  If err IsA ThreadEndException Or err IsA EndException Then Raise err
 		  Return False
-		End Function
-	#tag EndMethod
-
-	#tag Method, Flags = &h1
-		Protected Function IterateArchive(RARFile As FolderItem, Mode As Integer = RAR_OM_EXTRACT, Password As String = "") As UnRAR.ArchiveIterator
-		  Return ArchiveIterator.Open(RARFile, Mode, Password)
 		End Function
 	#tag EndMethod
 
@@ -107,70 +110,6 @@ Protected Module UnRAR
 		Private Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
 	#tag EndExternalMethod
 
-	#tag Method, Flags = &h1
-		Protected Function Version() As Integer
-		  If UnRAR.IsAvailable Then
-		    Return RARGetDllVersion()
-		  End If
-		End Function
-	#tag EndMethod
-
-
-	#tag Note, Name = Copying
-		The source code in this project is released under the terms of the MIT License, 
-		reproduced below. In addition to the terms of the license, it is requested that 
-		anyone with suggestions, bugs, feature requests, or their own code to contribute 
-		contact me at andrew[at]boredomsoft[dot]org
-		
-		--------------------------------------------------------------------------------
-		Copyright (c) 2013-15 Andrew Lambert
-		
-		Permission is hereby granted, free of charge, to any person obtaining a copy
-		of this software and associated documentation files (the "Software"), to deal
-		in the Software without restriction, including without limitation the rights
-		to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-		copies of the Software, and to permit persons to whom the Software is
-		furnished to do so, subject to the following conditions:
-		
-		The above copyright notice and this permission notice shall be included in
-		all copies or substantial portions of the Software.
-		
-		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-		IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-		FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-		AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-		LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-		OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-		THE SOFTWARE.
-	#tag EndNote
-
-
-	#tag Constant, Name = ArchiveFlag_AuthenticityInfo, Type = Double, Dynamic = False, Default = \"&h020", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_Comment, Type = Double, Dynamic = False, Default = \"&h002", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_EncryptedNames, Type = Double, Dynamic = False, Default = \"&h080", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_FirstVolume, Type = Double, Dynamic = False, Default = \"&h100", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_Locked, Type = Double, Dynamic = False, Default = \"&h004", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_NewNamingScheme, Type = Double, Dynamic = False, Default = \"&h010", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_RecoveryRecord, Type = Double, Dynamic = False, Default = \"&h040", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_Solid, Type = Double, Dynamic = False, Default = \"&h008", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ArchiveFlag_Volume, Type = Double, Dynamic = False, Default = \"&h001", Scope = Private
-	#tag EndConstant
 
 	#tag Constant, Name = ErrorBadArchive, Type = Double, Dynamic = False, Default = \"13", Scope = Protected
 	#tag EndConstant
@@ -214,28 +153,7 @@ Protected Module UnRAR
 	#tag Constant, Name = ErrorUnknownFormat, Type = Double, Dynamic = False, Default = \"14", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = ErrorUserCancel, Type = Double, Dynamic = False, Default = \"-1", Scope = Public
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_CommentPresent, Type = Double, Dynamic = False, Default = \"&h08", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_ContinuedNext, Type = Double, Dynamic = False, Default = \"&h02", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_ContinuedPrev, Type = Double, Dynamic = False, Default = \"&h01", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_Directory, Type = Double, Dynamic = False, Default = \"&h20", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_Encrypted, Type = Double, Dynamic = False, Default = \"&h04", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = ItemFlag_Solid, Type = Double, Dynamic = False, Default = \"&h10", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = RAR_DLL_VERSION, Type = Double, Dynamic = False, Default = \"3", Scope = Private
+	#tag Constant, Name = ErrorUserCancel, Type = Double, Dynamic = False, Default = \"-1", Scope = Protected
 	#tag EndConstant
 
 	#tag Constant, Name = RAR_EXTRACT, Type = Double, Dynamic = False, Default = \"2", Scope = Protected
@@ -253,29 +171,8 @@ Protected Module UnRAR
 	#tag Constant, Name = RAR_TEST, Type = Double, Dynamic = False, Default = \"1", Scope = Protected
 	#tag EndConstant
 
-	#tag Constant, Name = RAR_VOL_ASK, Type = Double, Dynamic = False, Default = \"0", Scope = Private
-	#tag EndConstant
 
-	#tag Constant, Name = RAR_VOL_NOTIFY, Type = Double, Dynamic = False, Default = \"1", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = UCM_CHANGEVOLUME, Type = Double, Dynamic = False, Default = \"0", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = UCM_CHANGEVOLUMEW, Type = Double, Dynamic = False, Default = \"3", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = UCM_NEEDPASSWORD, Type = Double, Dynamic = False, Default = \"2", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = UCM_NEEDPASSWORDW, Type = Double, Dynamic = False, Default = \"4", Scope = Private
-	#tag EndConstant
-
-	#tag Constant, Name = UCM_PROCESSDATA, Type = Double, Dynamic = False, Default = \"1", Scope = Private
-	#tag EndConstant
-
-
-	#tag Structure, Name = RARHeaderData, Flags = &h21
+	#tag Structure, Name = RARHeaderData, Flags = &h1
 		ArchiveName As CString*260
 		  FileName As CString*260
 		  Flags As UInt32
@@ -294,7 +191,7 @@ Protected Module UnRAR
 		CommentState As UInt32
 	#tag EndStructure
 
-	#tag Structure, Name = RARHeaderDataEx, Flags = &h21
+	#tag Structure, Name = RARHeaderDataEx, Flags = &h1
 		ArchiveName As String*1024
 		  ArchiveNameW As WString*1024
 		  FileName As CString*1024
@@ -342,12 +239,12 @@ Protected Module UnRAR
 		  CommentState As UInt32
 		  Flags As UInt32
 		  Callback As Ptr
-		  UserData As Ptr
+		  UserData As Integer
 		Reserved As Ptr
 	#tag EndStructure
 
 
-	#tag Enum, Name = PackingMethods, Type = Integer, Flags = &h1
+	#tag Enum, Name = PackingMethods, Flags = &h1
 		Store=&h30
 		  Fastest=&h31
 		  Fast=&h32
