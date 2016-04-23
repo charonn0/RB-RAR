@@ -364,7 +364,7 @@ End
 
 #tag WindowCode
 	#tag Method, Flags = &h21
-		Private Function ChangeVolumeHandler(Sender As UnRAR.IteratorEx, ByRef NextVolume As FolderItem) As Boolean
+		Private Function ChangeVolumeHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, ByRef NextVolume As FolderItem) As Boolean
 		  #pragma Unused Sender
 		  Dim dlg As New OpenDialog
 		  dlg.Filter = FileTypes1.WinRARArchive
@@ -388,6 +388,22 @@ End
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h21
+		Private Function ProcessDataHandler(Sender As UnRAR.IteratorEx, NewData As MemoryBlock, Length As Integer) As Boolean
+		  #pragma Unused Sender
+		  #pragma Unused NewData
+		  
+		  SizeNow = SizeNow + Length
+		  ProgressBar1.Value = SizeNow * 100 / SizeAll
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function VolumeChangedHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
+		  System.DebugLog("Changed volume to #" + Str(VolumeNumber) + "(" + NextVolume.AbsolutePath + ")")
+		End Function
+	#tag EndMethod
+
 
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.IteratorEx
@@ -399,6 +415,14 @@ End
 
 	#tag Property, Flags = &h1
 		Protected LastTop As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private SizeAll As UInt64
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private SizeNow As UInt64
 	#tag EndProperty
 
 
@@ -492,14 +516,20 @@ End
 		    If rar <> Nil And rar.IsRARArchive Then
 		      ArchList.DeleteAllRows
 		      ArchivePath.Text = rar.AbsolutePath
-		      Archive = New UnRAR.IteratorEx(rar, UnRAR.RAR_OM_EXTRACT)
+		      If Archive <> Nil Then Archive.Close
+		      Archive = New UnRAR.IteratorEx(rar)
 		      AddHandler Archive.GetPassword, WeakAddressOf GetPasswordHandler
 		      AddHandler Archive.ChangeVolume, WeakAddressOf ChangeVolumeHandler
+		      AddHandler Archive.ProcessData, WeakAddressOf ProcessDataHandler
+		      AddHandler Archive.VolumeChanged, WeakAddressOf VolumeChangedHandler
 		      Count = 0
+		      SizeAll = 0
+		      SizeNow = 0
 		      Do
 		        Dim d, sz, p As String
 		        d = Archive.CurrentItem.FileTime.SQLDateTime
 		        If Not Archive.CurrentItem.Directory Then
+		          SizeAll = SizeAll + Archive.CurrentItem.UnpackedSize
 		          sz = Format(Archive.CurrentItem.UnpackedSize, "###,###,###,###")
 		          p = Format(Archive.CurrentItem.PackedSize * 100 /Archive.CurrentItem.UnpackedSize, "#0.0#\%")
 		        End If
@@ -516,6 +546,7 @@ End
 		      TestAll.Enabled = True
 		      TestItem.Enabled = False
 		    End If
+		    ProgressBar1.Maximum = Count
 		  Else
 		    MsgBox(UnRAR.FormatError(UnRAR.ErrorRARUnavailable))
 		  End If
@@ -536,6 +567,8 @@ End
 #tag Events TestItem
 	#tag Event
 		Sub Action()
+		  ProgressBar1.Value = 0
+		  SizeNow = 0
 		  Dim item As UnRAR.ArchiveEntry = ArchList.RowTag(ArchList.ListIndex)
 		  If item = Nil Then Return
 		  
@@ -555,6 +588,8 @@ End
 #tag Events TestAll
 	#tag Event
 		Sub Action()
+		  ProgressBar1.Value = 0
+		  SizeNow = 0
 		  Do
 		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then Exit Do
 		  Loop
@@ -570,6 +605,8 @@ End
 #tag Events ExtractAll
 	#tag Event
 		Sub Action()
+		  ProgressBar1.Value = 0
+		  SizeNow = 0
 		  Dim f As FolderItem = SelectFolder()
 		  If f = Nil Then Return
 		  Do
@@ -587,6 +624,8 @@ End
 #tag Events ExtractItem
 	#tag Event
 		Sub Action()
+		  ProgressBar1.Value = 0
+		  SizeNow = 0
 		  Dim item As UnRAR.ArchiveEntry = ArchList.RowTag(ArchList.ListIndex)
 		  If item = Nil Then Return
 		  Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
