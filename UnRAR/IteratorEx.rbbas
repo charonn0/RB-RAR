@@ -4,12 +4,12 @@ Inherits UnRAR.Iterator
 	#tag Method, Flags = &h0
 		Sub Close()
 		  Super.Close
-		  mIsOpen = False
+		  mVolumeNumber = 1
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Constructor(RARFile As FolderItem, Mode As Integer, Password As String = "")
+		Sub Constructor(RARFile As FolderItem, Mode As Integer = UnRAR.RAR_OM_EXTRACT, Password As String = "")
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mArchFile = RARFile
 		  mOpenMode = Mode
@@ -33,13 +33,14 @@ Inherits UnRAR.Iterator
 		  ' If ProcessingMode is RAR_EXTRACT then pass a FolderItem to extract into. Pass a directory to extract the item into
 		  ' the directory using the item name (automatically creating subdirectories as needed); pass a non-existing file to extract
 		  ' directly into the file.
-		  ' If processing mode is RAR_TEST or RAR_SKIP then pass Nil as ExtractPath. Even in testing mode decompressed data will 
+		  ' If processing mode is RAR_TEST or RAR_SKIP then pass Nil as ExtractPath. Even in testing mode decompressed data will
 		  ' be passed to the ProcessData event, allowing for decompression without writing to the disk. In skip mode no data is
 		  ' passed to the ProcessData event.
 		  
 		  Dim FilePath, DirPath As MemoryBlock
 		  mLastError = 0
 		  If Not mIsOpen Then OpenArchive()
+		  
 		  Select Case True
 		  Case ExtractPath = Nil
 		    FilePath = Nil
@@ -129,7 +130,7 @@ Inherits UnRAR.Iterator
 		    
 		    Select Case UInt32(Param2)
 		    Case RAR_VOL_ASK
-		      If RaiseEvent ChangeVolume(f) Then 
+		      If RaiseEvent ChangeVolume(mVolumeNumber + 1, f) Then
 		        If f <> Nil Then ' if f is nil and the event returned true then UnRAR should retry the expected path
 		          If Message = UCM_CHANGEVOLUMEW Then mb.WString(0) = f.AbsolutePath Else mb.CString(0) = f.AbsolutePath
 		        End If
@@ -138,8 +139,13 @@ Inherits UnRAR.Iterator
 		      Return -1
 		      
 		    Case RAR_VOL_NOTIFY
-		      If Not RaiseEvent VolumeChanged(f) Then Return 1
-		      Return -1 ' abort
+		      If Message = UCM_CHANGEVOLUMEW Then 
+		        mVolumeNumber = mVolumeNumber + 1
+		        If Not RaiseEvent VolumeChanged(mVolumeNumber, f) Then Return 1
+		        Return -1 ' abort
+		      Else
+		        Return 1
+		      End If
 		    End Select
 		    
 		  Case UCM_PROCESSDATA
@@ -163,7 +169,7 @@ Inherits UnRAR.Iterator
 
 
 	#tag Hook, Flags = &h0
-		Event ChangeVolume(ByRef NextVolume As FolderItem) As Boolean
+		Event ChangeVolume(VolumeNumber As Integer, ByRef NextVolume As FolderItem) As Boolean
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
@@ -175,7 +181,7 @@ Inherits UnRAR.Iterator
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event VolumeChanged(NextVolume As FolderItem) As Boolean
+		Event VolumeChanged(VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
 	#tag EndHook
 
 
@@ -188,7 +194,7 @@ Inherits UnRAR.Iterator
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
-		Private mIsOpen As Boolean
+		Private mVolumeNumber As Integer = 1
 	#tag EndProperty
 
 
