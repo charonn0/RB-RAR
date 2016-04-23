@@ -181,7 +181,7 @@ Inherits UnRAR.Iterator
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event VolumeChanged(VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
+		Event VolumeChanged(VolumeNumber As Integer, NewVolume As FolderItem) As Boolean
 	#tag EndHook
 
 
