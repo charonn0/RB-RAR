@@ -1,6 +1,21 @@
 #tag Module
 Protected Module UnRAR
 	#tag Method, Flags = &h1
+		Protected Sub ExtractArchive(RARFile As FolderItem, Destination As FolderItem, Password As String = "")
+		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
+		  If Not RARFile.IsRARArchive Then Raise New UnsupportedFormatException
+		  
+		  Dim Archive As New UnRAR.IteratorEx(RARFile, RAR_OM_EXTRACT, Password)
+		  Do
+		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, Destination) Then Exit Do
+		  Loop Until Archive.LastError <> 0
+		  If Archive.LastError <> 0 And Archive.LastError <> ErrorEndArchive Then Raise New RARException(Archive.LastError)
+		  
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
 		Protected Function FormatError(RARErrorNumber As Integer) As String
 		  Select Case RARErrorNumber
 		  Case ErrorBadArchive
