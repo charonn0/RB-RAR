@@ -170,6 +170,15 @@ Protected Class ArchiveEntry
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function Operator_Compare(OtherItem As ArchiveEntry) As Integer
+		  If OtherItem Is Nil Then Return -1
+		  If OtherItem.RARFile.AbsolutePath <> Me.RARFile.AbsolutePath Then Return -1
+		  If OtherItem.Index <> Me.Index Then Return 1
+		  Return 0
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function PackedSize() As UInt32
 		  If Not IsEx Then
 		    Return RawData.PackedSize
