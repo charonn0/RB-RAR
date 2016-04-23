@@ -2,36 +2,27 @@
 Protected Class IteratorEx
 Inherits UnRAR.Iterator
 	#tag Method, Flags = &h0
+		Sub Close()
+		  Super.Close
+		  mIsOpen = False
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Mode As Integer, Password As String = "")
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
-		  mCommentBuffer = New MemoryBlock(260 * 2)
-		  Dim path As New MemoryBlock(RARFile.AbsolutePath.LenB * 2 + 2)
-		  Static UserData As Integer
-		  UserData = UserData + 1
-		  Dim UserDatum As Integer = UserData
-		  If Instances = Nil Then Instances = New Dictionary
-		  Instances.Value(UserDatum) = New WeakRef(Me)
-		  path.WString(0) = RARFile.AbsolutePath
-		  mArchiveHeader.CommentBufferSize = mCommentBuffer.Size
-		  mArchiveHeader.Comments = mCommentBuffer
-		  mArchiveHeader.ArchiveNameW = path
-		  mArchiveHeader.Callback = AddressOf RARCallback
-		  mArchiveHeader.UserData = UserDatum
-		  mArchiveHeader.OpenMode = mode
-		  ArchivePassword = Password
-		  mHandle = RAROpenArchiveEx(mArchiveHeader)
-		  mLastError = mArchiveHeader.OpenResult
-		  If mHandle = 0 Then
-		    Raise New RuntimeException
-		  End If
-		  
-		  Dim h As RARHeaderDataEx
-		  mLastError = RARReadHeaderEx(mHandle, h)
-		  If mLastError <> 0 Then Raise New RuntimeException
-		  mCurrentIndex = 0
 		  mArchFile = RARFile
-		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, mArchFile)
+		  mOpenMode = Mode
+		  ArchivePassword = Password
+		  
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function CurrentItem() As UnRAR.ArchiveEntry
+		  If Not mIsOpen Then OpenArchive()
+		  Return Super.CurrentItem
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
@@ -42,10 +33,13 @@ Inherits UnRAR.Iterator
 		  ' If ProcessingMode is RAR_EXTRACT then pass a FolderItem to extract into. Pass a directory to extract the item into
 		  ' the directory using the item name (automatically creating subdirectories as needed); pass a non-existing file to extract
 		  ' directly into the file.
+		  ' If processing mode is RAR_TEST or RAR_SKIP then pass Nil as ExtractPath. Even in testing mode decompressed data will 
+		  ' be passed to the ProcessData event, allowing for decompression without writing to the disk. In skip mode no data is
+		  ' passed to the ProcessData event.
 		  
 		  Dim FilePath, DirPath As MemoryBlock
 		  mLastError = 0
-		  
+		  If Not mIsOpen Then OpenArchive()
 		  Select Case True
 		  Case ExtractPath = Nil
 		    FilePath = Nil
@@ -61,14 +55,48 @@ Inherits UnRAR.Iterator
 		  If DirPath = Nil Then DirPath = ""
 		  mLastError = RARProcessFile(mhandle, ProcessingMode, DirPath, FilePath)
 		  If mLastError = 0 Then
-		    Dim header As RARHeaderDataEx
-		    mLastError = RARReadHeaderEx(mHandle, header)
+		    ' probably should use RARHeaderDataEx
+		    Dim header As RARHeaderData
+		    mLastError = RARReadHeader(mHandle, header)
 		    mCurrentIndex = mCurrentIndex + 1
-		    If mLastError = 0 Then mCurrentItem = New UnRAR.ArchiveEntry(header, mCurrentIndex, mArchFile)
+		    If mLastError = 0 Then mCurrentItem = New UnRAR.ArchiveEntry(header, mCurrentIndex, Me.ArchiveFile)
 		  End If
 		  
 		  Return mLastError = 0
 		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Sub OpenArchive()
+		  mCommentBuffer = New MemoryBlock(260 * 2)
+		  Dim path As New MemoryBlock(mArchFile.AbsolutePath.LenB * 2 + 2)
+		  Static UserData As Integer
+		  UserData = UserData + 1
+		  Dim UserDatum As Integer = UserData
+		  If Instances = Nil Then Instances = New Dictionary
+		  Instances.Value(UserDatum) = New WeakRef(Me)
+		  path.WString(0) = mArchFile.AbsolutePath
+		  mArchiveHeader.CommentBufferSize = mCommentBuffer.Size
+		  mArchiveHeader.Comments = mCommentBuffer
+		  mArchiveHeader.ArchiveNameW = path
+		  mArchiveHeader.Callback = AddressOf RARCallback
+		  mArchiveHeader.UserData = UserDatum
+		  mArchiveHeader.OpenMode = mOpenMode
+		  
+		  mHandle = RAROpenArchiveEx(mArchiveHeader)
+		  mLastError = mArchiveHeader.OpenResult
+		  
+		  If mHandle = 0 Then
+		    Raise New RARException(mLastError)
+		  End If
+		  
+		  Dim h As RARHeaderData
+		  mLastError = RARReadHeader(mHandle, h)
+		  If mLastError <> 0 Then Raise New RARException(mLastError)
+		  mCurrentIndex = 0
+		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, Me.ArchiveFile)
+		  mIsOpen = True
+		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
@@ -85,8 +113,8 @@ Inherits UnRAR.Iterator
 
 	#tag Method, Flags = &h0
 		Sub Reset()
-		  Me.Destructor
-		  Me.Constructor(mArchFile, mOpenMode)
+		  Me.Close
+		  Me.Constructor(Me.ArchiveFile, mOpenMode, ArchivePassword)
 		End Sub
 	#tag EndMethod
 
@@ -94,31 +122,41 @@ Inherits UnRAR.Iterator
 		Private Function _RARCallback(Message As UInt32, Param1 As Ptr, Param2 As Ptr) As Integer
 		  Select Case Message
 		  Case UCM_CHANGEVOLUME, UCM_CHANGEVOLUMEW
-		    If Param2.UInt32(0) = RAR_VOL_ASK Then
-		      Dim path As String = Param1.CString(0)
-		      Dim f As FolderItem = GetFolderItem(path)
-		      If RaiseEvent ChangeVolume(f) Then
-		        Param1.CString(0) = f.AbsolutePath + Chr(0)
+		    Dim mb As MemoryBlock = Param1
+		    Dim path As String
+		    If Message = UCM_CHANGEVOLUMEW Then path = mb.WString(0) Else path = mb.CString(0)
+		    Dim f As FolderItem = GetFolderItem(path)
+		    
+		    Select Case UInt32(Param2)
+		    Case RAR_VOL_ASK
+		      If RaiseEvent ChangeVolume(f) Then 
+		        If f <> Nil Then ' if f is nil and the event returned true then UnRAR should retry the expected path
+		          If Message = UCM_CHANGEVOLUMEW Then mb.WString(0) = f.AbsolutePath Else mb.CString(0) = f.AbsolutePath
+		        End If
 		        Return 1
 		      End If
-		    ElseIf Param2.UInt32(0) = RAR_VOL_NOTIFY Then
-		      Return 1
-		    End If
+		      Return -1
+		      
+		    Case RAR_VOL_NOTIFY
+		      If Not RaiseEvent VolumeChanged(f) Then Return 1
+		      Return -1 ' abort
+		    End Select
 		    
 		  Case UCM_PROCESSDATA
 		    If Not RaiseEvent ProcessData(Param1, Integer(Param2)) Then Return 1
 		    Return -1 ' abort
 		    
-		  Case UCM_NEEDPASSWORD
+		  Case UCM_NEEDPASSWORD, UCM_NEEDPASSWORDW
+		    If ArchivePassword.Trim = "" And Not RaiseEvent GetPassword(ArchivePassword) Then Return 0
 		    Dim mb As MemoryBlock = Param1
-		    If ArchivePassword.Trim = "" And Not RaiseEvent PasswordRequired(ArchivePassword) Then Return -1 ' cancel
-		    mb.CString(0) = ArchivePassword
+		    If Message = UCM_NEEDPASSWORDW Then
+		      mb.WString(0) = ArchivePassword
+		    Else
+		      mb.CString(0) = ArchivePassword
+		    End If
 		    Param2 = Ptr(ArchivePassword.Len)
 		    Return 1
 		    
-		    'Case UCM_NEEDPASSWORDW
-		    'Param1.WString(0) = ArchivePassword
-		    'Return 1
 		  End Select
 		End Function
 	#tag EndMethod
@@ -129,11 +167,15 @@ Inherits UnRAR.Iterator
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
-		Event PasswordRequired(ByRef Password As String) As Boolean
+		Event GetPassword(ByRef ArchivePassword As String) As Boolean
 	#tag EndHook
 
 	#tag Hook, Flags = &h0
 		Event ProcessData(NewData As MemoryBlock, Length As Integer) As Boolean
+	#tag EndHook
+
+	#tag Hook, Flags = &h0
+		Event VolumeChanged(NextVolume As FolderItem) As Boolean
 	#tag EndHook
 
 
@@ -143,6 +185,10 @@ Inherits UnRAR.Iterator
 
 	#tag Property, Flags = &h21
 		Private mArchiveHeader As RAROpenArchiveDataEx
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mIsOpen As Boolean
 	#tag EndProperty
 
 
