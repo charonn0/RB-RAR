@@ -363,6 +363,32 @@ End
 #tag EndWindow
 
 #tag WindowCode
+	#tag Method, Flags = &h21
+		Private Function ChangeVolumeHandler(Sender As UnRAR.IteratorEx, ByRef NextVolume As FolderItem) As Boolean
+		  #pragma Unused Sender
+		  Dim dlg As New OpenDialog
+		  dlg.Filter = FileTypes1.WinRARArchive
+		  If NextVolume <> Nil Then
+		    dlg.InitialDirectory = NextVolume.Parent
+		    dlg.SuggestedFileName = NextVolume.Name
+		  End If
+		  dlg.PromptText = "Locate next volume in the archive"
+		  Dim f As FolderItem = dlg.ShowModal
+		  If f <> Nil Then
+		    NextVolume = f
+		    Return True
+		  End If
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function GetPasswordHandler(Sender As UnRAR.IteratorEx, ByRef ArchivePassword As String) As Boolean
+		  ArchivePassword = RARPasswordWin.GetPassword(Sender.ArchiveFile)
+		  Return True
+		End Function
+	#tag EndMethod
+
+
 	#tag Property, Flags = &h1
 		Protected Archive As UnRAR.IteratorEx
 	#tag EndProperty
@@ -467,19 +493,19 @@ End
 		      ArchList.DeleteAllRows
 		      ArchivePath.Text = rar.AbsolutePath
 		      Archive = New UnRAR.IteratorEx(rar, UnRAR.RAR_OM_EXTRACT)
+		      AddHandler Archive.GetPassword, WeakAddressOf GetPasswordHandler
+		      AddHandler Archive.ChangeVolume, WeakAddressOf ChangeVolumeHandler
 		      Count = 0
 		      Do
-		        If Archive.CurrentItem.Directory Then
-		          ArchList.AddFolder(Archive.CurrentItem.FileName)
-		        Else
-		          Dim d, sz, p As String
-		          d = Archive.CurrentItem.FileTime.SQLDateTime
+		        Dim d, sz, p As String
+		        d = Archive.CurrentItem.FileTime.SQLDateTime
+		        If Not Archive.CurrentItem.Directory Then
 		          sz = Format(Archive.CurrentItem.UnpackedSize, "###,###,###,###")
 		          p = Format(Archive.CurrentItem.PackedSize * 100 /Archive.CurrentItem.UnpackedSize, "#0.0#\%")
-		          ArchList.AddRow(Archive.CurrentItem.FileName, sz, p, d)
-		          ArchList.CellTag(ArchList.LastIndex, 1) = Archive.CurrentItem.UnpackedSize
-		          ArchList.CellTag(ArchList.LastIndex, 2) = Archive.CurrentItem.PackedSize * 100 / Archive.CurrentItem.UnpackedSize
 		        End If
+		        ArchList.AddRow(Archive.CurrentItem.FileName, sz, p, d)
+		        ArchList.CellTag(ArchList.LastIndex, 1) = Archive.CurrentItem.UnpackedSize
+		        ArchList.CellTag(ArchList.LastIndex, 2) = Archive.CurrentItem.PackedSize * 100 / Archive.CurrentItem.UnpackedSize
 		        ArchList.RowTag(ArchList.LastIndex) = Archive.CurrentItem
 		        count = count + 1
 		      Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
@@ -522,23 +548,22 @@ End
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  End If
+		  Archive.Reset()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
 #tag Events TestAll
 	#tag Event
 		Sub Action()
-		  Do 
-		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then
-		      MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
-		      Exit Do
-		    End If
-		  Loop Until Archive.LastError <> 0
+		  Do
+		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then Exit Do
+		  Loop
 		  If Archive.LastError = UnRAR.ErrorEndArchive Then
 		    MsgBox("Test OK")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  End If
+		  Archive.Reset()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -551,10 +576,11 @@ End
 		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, f) Then Exit Do
 		  Loop Until Archive.LastError <> 0
 		  If Archive.LastError = UnRAR.ErrorEndArchive Then
-		    MsgBox("Test OK")
+		    MsgBox("Extract OK")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  End If
+		  Archive.Reset()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -569,12 +595,12 @@ End
 		  Do Until Archive.CurrentItem.Index = item.Index
 		    App.YieldToNextThread
 		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
-		  If Archive.MoveNext(UnRAR.RAR_Extract, f) Then
+		  If Archive.MoveNext(UnRAR.RAR_Extract, f) Or Archive.LastError = UnRAR.ErrorEndArchive Then
 		    MsgBox("Extract OK")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  End If
-		  
+		  Archive.Reset()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
