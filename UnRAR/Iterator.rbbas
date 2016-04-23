@@ -15,12 +15,12 @@ Protected Class Iterator
 		  mHandle = RAROpenArchive(mArchiveHeader)
 		  mLastError = mArchiveHeader.OpenResult
 		  If mHandle = 0 Then
-		    Raise New RuntimeException
+		    Raise New RARException(mLastError)
 		  End If
 		  
 		  Dim h As RARHeaderData
 		  mLastError = RARReadHeader(mHandle, h)
-		  If mLastError <> 0 Then Raise New RuntimeException
+		  If mLastError <> 0 Then Raise New RARException(mLastError)
 		  mCurrentIndex = 0
 		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, mArchFile)
 		  
