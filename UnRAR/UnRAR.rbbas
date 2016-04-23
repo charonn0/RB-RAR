@@ -110,6 +110,15 @@ Protected Module UnRAR
 		Private Soft Declare Sub RARSetPassword Lib "UnRAR" (Handle As Integer, Password As CString)
 	#tag EndExternalMethod
 
+	#tag Method, Flags = &h1
+		Protected Function Version() As Integer
+		  If System.IsFunctionAvailable("RARGetDllVersion", "UnRAR") Then
+		    Return RARGetDllVersion()
+		  End If
+		  Return -1
+		End Function
+	#tag EndMethod
+
 
 	#tag Constant, Name = ErrorBadArchive, Type = Double, Dynamic = False, Default = \"13", Scope = Protected
 	#tag EndConstant

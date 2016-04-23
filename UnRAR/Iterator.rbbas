@@ -102,7 +102,7 @@ Protected Class Iterator
 		  If mHandle = 0 Then
 		    Raise New RARException(mLastError)
 		  End If
-		   If ArchivePassword <> "" Then 
+		  If ArchivePassword <> "" Then
 		    Dim mb As New MemoryBlock(ArchivePassword.LenB + 1)
 		    mb.CString(0) = ArchivePassword
 		    RARSetPassword(mHandle, mb) 
