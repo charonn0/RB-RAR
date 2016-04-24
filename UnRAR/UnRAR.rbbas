@@ -1,7 +1,7 @@
 #tag Module
 Protected Module UnRAR
 	#tag Method, Flags = &h1
-		Protected Sub ExtractArchive(RARFile As FolderItem, Destination As FolderItem, Password As String = "")
+		Protected Sub ExtractArchive(ArchiveIndex As Integer = -1, RARFile As FolderItem, Destination As FolderItem, Password As String = "")
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  If Not RARFile.IsRARArchive Then Raise New UnsupportedFormatException
 		  
@@ -23,21 +23,21 @@ Protected Module UnRAR
 		  Case ErrorBadData
 		    Return "The archive is encrypted or corrupt."
 		  Case ErrorEClose
-		    Return "The archive could not be closed."
+		    Return "The archive can not be closed."
 		  Case ErrorECreate
-		    Return "The output file could not be created."
+		    Return "The output file can not be created."
 		  Case ErrorEndArchive
 		    Return "The archive contains no additional entries."
 		  Case ErrorEOpen
-		    Return "The archive could not be opened."
+		    Return "The archive can not be opened."
 		  Case ErrorERead
-		    Return "The archive could not be read."
+		    Return "The archive can not be read."
 		  Case ErrorEWrite
-		    Return "The output file could not be written."
+		    Return "The output file can not be written."
 		  Case ErrorNoMemory
 		    Return "Out of memory!"
 		  Case ErrorSmallBuff
-		    Return "The output buffer was too small to contain the requested data."
+		    Return "The output buffer is too small to contain the requested data."
 		  Case ErrorNeedPassword
 		    Return "A password is required in order to access the archive."
 		  Case ErrorUnknown
