@@ -365,15 +365,7 @@ End
 #tag WindowCode
 	#tag Method, Flags = &h21
 		Private Function ChangeVolumeHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, ByRef NextVolume As FolderItem) As Boolean
-		  #pragma Unused Sender
-		  Dim dlg As New OpenDialog
-		  dlg.Filter = FileTypes1.WinRARArchive
-		  If NextVolume <> Nil Then
-		    dlg.InitialDirectory = NextVolume.Parent
-		    dlg.SuggestedFileName = NextVolume.Name
-		  End If
-		  dlg.PromptText = "Locate next volume in the archive"
-		  Dim f As FolderItem = dlg.ShowModal
+		  Dim f As FolderItem = RARVolumeSelect.GetVolume(Sender.ArchiveFile.Name, VolumeNumber, NextVolume)
 		  If f <> Nil Then
 		    NextVolume = f
 		    Return True

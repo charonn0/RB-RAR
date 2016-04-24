@@ -1,6 +1,7 @@
 Type=Desktop
 RBProjectVersion=2011.043
 MinIDEVersion=20070100
+Window=RARVolumeSelect;RARVolumeSelect.rbfrm;&h5F6C8FFF;&h0;false
 Class=App;App.rbbas;&h60157FF;&h0;false
 Window=Window1;Window1.rbfrm;&h5F62E7FF;&h0;false
 BuildSteps=Build Automation;Build Automation.rbbas;&h4B100FFF;&h0;false
