@@ -20,7 +20,11 @@ Inherits UnRAR.Iterator
 
 	#tag Method, Flags = &h0
 		Function CurrentItem() As UnRAR.ArchiveEntry
-		  If Not mIsOpen Then OpenArchive()
+		  Try
+		    If Not mIsOpen Then OpenArchive()
+		  Catch Err As RARException
+		    Return Nil
+		  End Try
 		  Return Super.CurrentItem
 		End Function
 	#tag EndMethod
@@ -39,7 +43,11 @@ Inherits UnRAR.Iterator
 		  
 		  Dim FilePath, DirPath As MemoryBlock
 		  mLastError = 0
-		  If Not mIsOpen Then OpenArchive()
+		  Try
+		    If Not mIsOpen Then OpenArchive()
+		  Catch Err As RARException
+		    Return False
+		  End Try
 		  
 		  Select Case True
 		  Case ExtractPath = Nil
@@ -57,8 +65,10 @@ Inherits UnRAR.Iterator
 		  mLastError = RARProcessFile(mhandle, ProcessingMode, DirPath, FilePath)
 		  If mLastError = 0 Then
 		    ' probably should use RARHeaderDataEx
-		    Dim header As RARHeaderData
-		    mLastError = RARReadHeader(mHandle, header)
+		    Dim header As RARHeaderDataEx
+		    mLastError = RARReadHeaderEx(mHandle, header)
+		    Dim data As New MemoryBlock(header.Size)
+		    data.StringValue(0, header.Size) = header.StringValue(TargetLittleEndian)
 		    mCurrentIndex = mCurrentIndex + 1
 		    If mLastError = 0 Then mCurrentItem = New UnRAR.ArchiveEntry(header, mCurrentIndex, Me.ArchiveFile)
 		  End If
@@ -86,16 +96,14 @@ Inherits UnRAR.Iterator
 		  
 		  mHandle = RAROpenArchiveEx(mArchiveHeader)
 		  mLastError = mArchiveHeader.OpenResult
+		  If mHandle = 0 Then Raise New RARException(mLastError)
 		  
-		  If mHandle = 0 Then
-		    Raise New RARException(mLastError)
-		  End If
 		  
-		  Dim h As RARHeaderData
-		  mLastError = RARReadHeader(mHandle, h)
+		  Dim h As RARHeaderDataEx
+		  mLastError = RARReadHeaderEx(mHandle, h)
 		  If mLastError <> 0 Then Raise New RARException(mLastError)
 		  mCurrentIndex = 0
-		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, Me.ArchiveFile)
+		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, mArchFile)
 		  mIsOpen = True
 		End Sub
 	#tag EndMethod

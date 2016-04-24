@@ -50,12 +50,7 @@ Protected Class ArchiveEntry
 
 	#tag Method, Flags = &h0
 		Function Directory() As Boolean
-		  If Not IsEx Then
-		    Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
-		  Else
-		    Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
-		  End If
-		  
+		  Return BitAnd(Me.Flags, ItemFlag_Directory) = ItemFlag_Directory
 		End Function
 	#tag EndMethod
 
@@ -74,7 +69,7 @@ Protected Class ArchiveEntry
 		  If Not IsEx Then
 		    Return RawData.FileName
 		  Else
-		    Return DefineEncoding(RawDataEx.FileNameW, Encodings.UTF8)
+		    Return DefineEncoding(RawDataEx.FileNameW, Encodings.UTF16)
 		  End If
 		End Function
 	#tag EndMethod
@@ -179,11 +174,11 @@ Protected Class ArchiveEntry
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Function PackedSize() As UInt32
+		Function PackedSize() As UInt64
 		  If Not IsEx Then
 		    Return RawData.PackedSize
 		  Else
-		    Return BitOr(ShiftLeft(RawDataEx.UnpackedSizeHi, 32), RawDataEx.UnpackedSize)
+		    Return BitOr(ShiftLeft(RawDataEx.PackedSizeHi, 32), RawDataEx.PackedSize)
 		  End If
 		  
 		End Function
@@ -211,7 +206,11 @@ Protected Class ArchiveEntry
 		  If Not IsEx Then
 		    Return RawData.UnpackedSize
 		  Else
-		    Return BitOr(ShiftLeft(RawDataEx.UnpackedSizeHi, 32), RawDataEx.UnpackedSize)
+		    Dim hi, lo As UInt32
+		    hi = RawDataEx.UnpackedSizeHi
+		    lo = RawDataEx.UnpackedSize
+		    Return BitOr(ShiftLeft(hi, 32), lo)
+		    
 		  End If
 		  
 		End Function

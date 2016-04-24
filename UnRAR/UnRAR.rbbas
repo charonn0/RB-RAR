@@ -201,10 +201,10 @@ Protected Module UnRAR
 	#tag EndStructure
 
 	#tag Structure, Name = RARHeaderDataEx, Flags = &h1
-		ArchiveName As String*1024
-		  ArchiveNameW As WString*1024
+		ArchiveName As CString*1024
+		  ArchiveNameW As WString*2048
 		  FileName As CString*1024
-		  FileNameW As WString*1024
+		  FileNameW As WString*2048
 		  Flags As UInt32
 		  PackedSize As UInt32
 		  PackedSizeHi As UInt32
