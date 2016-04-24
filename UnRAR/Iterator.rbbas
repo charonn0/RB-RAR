@@ -1,13 +1,30 @@
 #tag Class
 Protected Class Iterator
 	#tag Method, Flags = &h0
+		Function ArchiveComment() As String
+		  ' The RAR archive's comment, if any
+		  
+		  Try
+		    If Not mIsOpen Then OpenArchive()
+		  Catch Err As RARException
+		    Return ""
+		  End Try
+		  If mCommentBuffer <> Nil Then Return mCommentBuffer.CString(0)
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function ArchiveFile() As FolderItem
+		  ' The RAR archive file
+		  
 		  Return mArchFile
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
 		Sub Close()
+		  ' Closes the archive if it's open. Calling MoveNext again will re-open the archive at index=0
+		  
 		  If mIsOpen And mHandle <> 0 Then mLastError = RARCloseArchive(mHandle)
 		  mIsOpen = False
 		End Sub
@@ -15,6 +32,12 @@ Protected Class Iterator
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Mode As Integer = UnRAR.RAR_OM_EXTRACT, Password As String = "")
+		  ' Prepares the Iterator but does not open the archive.
+		  ' If the archive contents are encrypted then specify the password.
+		  ' If the archive headers are encrypted (i.e. "encrypt file names" was
+		  ' checked when the archive was created) then you will not be abled to 
+		  ' use this class to access the archive (use IteratorEx instead.)
+		  
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mArchFile = RARFile
 		  mOpenMode = Mode
@@ -24,7 +47,13 @@ Protected Class Iterator
 
 	#tag Method, Flags = &h0
 		Function CurrentItem() As UnRAR.ArchiveEntry
-		  If Not mIsOpen Then OpenArchive()
+		  ' Returns a ArchiveEntry object that represents the archive header at the current index.
+		  
+		  Try
+		    If Not mIsOpen Then OpenArchive()
+		  Catch Err As RARException
+		    Return Nil
+		  End Try
 		  Return mCurrentItem
 		End Function
 	#tag EndMethod
@@ -58,7 +87,11 @@ Protected Class Iterator
 		  
 		  Dim FilePath, DirPath As MemoryBlock
 		  mLastError = 0
-		  If Not mIsOpen Then OpenArchive()
+		  Try
+		    If Not mIsOpen Then OpenArchive()
+		  Catch Err As RARException
+		    Return False
+		  End Try
 		  
 		  Select Case True
 		  Case ExtractPath = Nil
@@ -89,6 +122,9 @@ Protected Class Iterator
 
 	#tag Method, Flags = &h1
 		Protected Sub OpenArchive()
+		  ' Opens the archive and moves the current index to 0. Only one 
+		  ' instance may have an archive open at any given time.
+		  
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mCommentBuffer = New MemoryBlock(260 * 2)
 		  Dim path As New MemoryBlock(mArchFile.AbsolutePath.LenB + 1)
@@ -97,16 +133,17 @@ Protected Class Iterator
 		  mArchiveHeader.Comments = mCommentBuffer
 		  mArchiveHeader.ArchiveName = path
 		  mArchiveHeader.OpenMode = mOpenMode
+		  
 		  mHandle = RAROpenArchive(mArchiveHeader)
 		  mLastError = mArchiveHeader.OpenResult
-		  If mHandle = 0 Then
-		    Raise New RARException(mLastError)
-		  End If
+		  If mHandle = 0 Then Raise New RARException(mLastError)
+		  
 		  If ArchivePassword <> "" Then
 		    Dim mb As New MemoryBlock(ArchivePassword.LenB + 1)
 		    mb.CString(0) = ArchivePassword
-		    RARSetPassword(mHandle, mb) 
+		    RARSetPassword(mHandle, mb)
 		  End If
+		  
 		  Dim h As RARHeaderData
 		  mLastError = RARReadHeader(mHandle, h)
 		  If mLastError <> 0 Then Raise New RARException(mLastError)
