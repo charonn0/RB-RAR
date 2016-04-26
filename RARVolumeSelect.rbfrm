@@ -2,9 +2,9 @@
 Begin Window RARVolumeSelect
    BackColor       =   &hFFFFFF
    Backdrop        =   ""
-   CloseButton     =   True
+   CloseButton     =   False
    Composite       =   False
-   Frame           =   0
+   Frame           =   1
    FullScreen      =   False
    HasBackColor    =   False
    Height          =   1.41e+2
@@ -17,13 +17,13 @@ Begin Window RARVolumeSelect
    MenuBar         =   ""
    MenuBarVisible  =   True
    MinHeight       =   64
-   MinimizeButton  =   True
+   MinimizeButton  =   False
    MinWidth        =   64
-   Placement       =   0
-   Resizeable      =   True
+   Placement       =   1
+   Resizeable      =   False
    Title           =   "Missing volume"
    Visible         =   True
-   Width           =   3.95e+2
+   Width           =   5.13e+2
    Begin Label Label1
       AutoDeactivate  =   True
       Bold            =   ""
@@ -90,7 +90,7 @@ Begin Window RARVolumeSelect
       Transparent     =   False
       Underline       =   ""
       Visible         =   True
-      Width           =   287
+      Width           =   408
    End
    Begin Label Label2
       AutoDeactivate  =   True
@@ -158,7 +158,7 @@ Begin Window RARVolumeSelect
       Transparent     =   False
       Underline       =   ""
       Visible         =   True
-      Width           =   287
+      Width           =   408
    End
    Begin PushButton LocateBtn
       AutoDeactivate  =   True
@@ -173,7 +173,7 @@ Begin Window RARVolumeSelect
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   ""
-      Left            =   307
+      Left            =   413
       LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
@@ -265,7 +265,7 @@ Begin Window RARVolumeSelect
       Underline       =   ""
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   278
+      Width           =   385
    End
    Begin PushButton OKBtn
       AutoDeactivate  =   True
@@ -280,7 +280,7 @@ Begin Window RARVolumeSelect
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   ""
-      Left            =   203
+      Left            =   262
       LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
@@ -311,7 +311,7 @@ Begin Window RARVolumeSelect
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   ""
-      Left            =   111
+      Left            =   170
       LockBottom      =   ""
       LockedInPosition=   False
       LockLeft        =   True
