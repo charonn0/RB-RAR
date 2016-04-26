@@ -384,15 +384,16 @@ End
 		Private Function ProcessDataHandler(Sender As UnRAR.IteratorEx, NewData As MemoryBlock, Length As Integer) As Boolean
 		  #pragma Unused Sender
 		  #pragma Unused NewData
-		  
-		  SizeNow = SizeNow + Length
-		  ProgressBar1.Value = SizeNow * 100 / SizeAll
+		  #pragma Unused Length
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function VolumeChangedHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
-		  System.DebugLog("Changed volume to #" + Str(VolumeNumber) + "(" + NextVolume.AbsolutePath + ")")
+		  #pragma Unused Sender
+		  #If DebugBuild Then
+		    System.DebugLog("Changed volume to #" + Str(VolumeNumber) + "(" + NextVolume.AbsolutePath + ")")
+		  #endif
 		End Function
 	#tag EndMethod
 
@@ -503,45 +504,50 @@ End
 #tag Events OpenRAR
 	#tag Event
 		Sub Action()
-		  If UnRAR.IsAvailable Then
-		    Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
-		    If rar <> Nil And rar.IsRARArchive Then
-		      ArchList.DeleteAllRows
-		      ArchivePath.Text = rar.AbsolutePath
-		      If Archive <> Nil Then Archive.Close
-		      Archive = New UnRAR.IteratorEx(rar)
-		      AddHandler Archive.GetPassword, WeakAddressOf GetPasswordHandler
-		      AddHandler Archive.ChangeVolume, WeakAddressOf ChangeVolumeHandler
-		      AddHandler Archive.ProcessData, WeakAddressOf ProcessDataHandler
-		      AddHandler Archive.VolumeChanged, WeakAddressOf VolumeChangedHandler
-		      Count = 0
-		      SizeAll = 0
-		      SizeNow = 0
-		      Do
-		        Dim d, sz, p As String
-		        d = Archive.CurrentItem.FileTime.SQLDateTime
-		        If Not Archive.CurrentItem.Directory Then
-		          SizeAll = SizeAll + Archive.CurrentItem.UnpackedSize
-		          sz = Format(Archive.CurrentItem.UnpackedSize, "###,###,###,###")
-		          p = Format(Archive.CurrentItem.PackedSize * 100 /Archive.CurrentItem.UnpackedSize, "#0.0#\%")
-		        End If
-		        ArchList.AddRow(Archive.CurrentItem.FileName, sz, p, d)
-		        ArchList.CellTag(ArchList.LastIndex, 1) = Archive.CurrentItem.UnpackedSize
-		        ArchList.CellTag(ArchList.LastIndex, 2) = Archive.CurrentItem.PackedSize * 100 / Archive.CurrentItem.UnpackedSize
-		        ArchList.RowTag(ArchList.LastIndex) = Archive.CurrentItem
-		        count = count + 1
-		      Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
-		      Archive.Reset()
-		      Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count + 1, "###,###,##0") + " items)"
-		      ExtractAll.Enabled = True
-		      ExtractItem.Enabled = False
-		      TestAll.Enabled = True
-		      TestItem.Enabled = False
-		    End If
-		    ProgressBar1.Maximum = Count
-		  Else
+		  If Not UnRAR.IsAvailable Then 
 		    MsgBox(UnRAR.FormatError(UnRAR.ErrorRARUnavailable))
+		    Return
 		  End If
+		  Dim rar As FolderItem = GetOpenFolderItem(FileTypes1.All)
+		  If rar = Nil Or Not rar.IsRARArchive Then
+		    MsgBox("Not a RAR archive.")
+		    Return
+		  End If
+		  
+		  ArchList.DeleteAllRows
+		  ArchivePath.Text = rar.AbsolutePath
+		  If Archive <> Nil Then Archive.Close
+		  Archive = New UnRAR.IteratorEx(rar)
+		  AddHandler Archive.GetPassword, WeakAddressOf GetPasswordHandler
+		  AddHandler Archive.ChangeVolume, WeakAddressOf ChangeVolumeHandler
+		  AddHandler Archive.ProcessData, WeakAddressOf ProcessDataHandler
+		  AddHandler Archive.VolumeChanged, WeakAddressOf VolumeChangedHandler
+		  Count = 0
+		  SizeAll = 0
+		  SizeNow = 0
+		  
+		  Do
+		    Dim d, sz, p As String
+		    d = Archive.CurrentItem.FileTime.SQLDateTime
+		    If Not Archive.CurrentItem.Directory Then
+		      SizeAll = SizeAll + Archive.CurrentItem.UnpackedSize
+		      sz = Format(Archive.CurrentItem.UnpackedSize, "###,###,###,###")
+		      p = Format(Archive.CurrentItem.PackedSize * 100 /Archive.CurrentItem.UnpackedSize, "#0.0#\%")
+		    End If
+		    ArchList.AddRow(Archive.CurrentItem.FileName, sz, p, d)
+		    ArchList.CellTag(ArchList.LastIndex, 1) = Archive.CurrentItem.UnpackedSize
+		    ArchList.CellTag(ArchList.LastIndex, 2) = Archive.CurrentItem.PackedSize * 100 / Archive.CurrentItem.UnpackedSize
+		    ArchList.RowTag(ArchList.LastIndex) = Archive.CurrentItem
+		    count = count + 1
+		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
+		  
+		  Archive.Reset()
+		  Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
+		  ExtractAll.Enabled = True
+		  ExtractItem.Enabled = False
+		  TestAll.Enabled = True
+		  TestItem.Enabled = False
+		  ProgressBar1.Maximum = Count
 		  
 		Exception Err As RuntimeException
 		  If Archive <> Nil And Archive.LastError <> 0 Then
@@ -566,9 +572,11 @@ End
 		  
 		  Do Until Archive.CurrentItem.Index = item.Index
 		    App.YieldToNextThread
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
 		  
 		  If Archive.MoveNext(UnRAR.RAR_TEST) Or Archive.LastError = UnRAR.ErrorEndArchive Then
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		    MsgBox("Test OK")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
@@ -583,6 +591,7 @@ End
 		  ProgressBar1.Value = 0
 		  SizeNow = 0
 		  Do
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then Exit Do
 		  Loop
 		  If Archive.LastError = UnRAR.ErrorEndArchive Then
@@ -602,6 +611,7 @@ End
 		  Dim f As FolderItem = SelectFolder()
 		  If f = Nil Then Return
 		  Do
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, f) Then Exit Do
 		  Loop Until Archive.LastError <> 0
 		  If Archive.LastError = UnRAR.ErrorEndArchive Then
@@ -625,8 +635,10 @@ End
 		  
 		  Do Until Archive.CurrentItem.Index = item.Index
 		    App.YieldToNextThread
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
 		  If Archive.MoveNext(UnRAR.RAR_Extract, f) Or Archive.LastError = UnRAR.ErrorEndArchive Then
+		    ProgressBar1.Value = ProgressBar1.Value + 1
 		    MsgBox("Extract OK")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
