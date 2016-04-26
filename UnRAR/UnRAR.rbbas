@@ -1,15 +1,24 @@
 #tag Module
 Protected Module UnRAR
 	#tag Method, Flags = &h1
-		Protected Sub ExtractArchive(ArchiveIndex As Integer = -1, RARFile As FolderItem, Destination As FolderItem, Password As String = "")
+		Protected Sub ExtractArchive(RARFile As FolderItem, Destination As FolderItem, Password As String = "", ArchiveIndex As Integer = - 1)
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  If Not RARFile.IsRARArchive Then Raise New UnsupportedFormatException
 		  
 		  Dim Archive As New UnRAR.IteratorEx(RARFile, RAR_OM_EXTRACT, Password)
 		  Do
-		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, Destination) Then Exit Do
+		    Select Case True
+		    Case ArchiveIndex = -1, Archive.CurrentItem.Index = ArchiveIndex
+		      Call Archive.MoveNext(UnRAR.RAR_EXTRACT, Destination)
+		    Case Archive.CurrentItem.Index < ArchiveIndex
+		      Call Archive.MoveNext(UnRAR.RAR_SKIP)
+		    Else
+		      Raise New OutOfBoundsException
+		    End Select
 		  Loop Until Archive.LastError <> 0
-		  If Archive.LastError <> 0 And Archive.LastError <> ErrorEndArchive Then Raise New RARException(Archive.LastError)
+		  If Archive.LastError <> 0 And (Archive.LastError <> ErrorEndArchive Or ArchiveIndex > Archive.CurrentItem.Index) Then 
+		    Raise New RARException(Archive.LastError)
+		  End If
 		  
 		  
 		End Sub
