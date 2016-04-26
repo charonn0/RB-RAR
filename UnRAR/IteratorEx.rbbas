@@ -14,7 +14,6 @@ Inherits UnRAR.Iterator
 		  mArchFile = RARFile
 		  mOpenMode = Mode
 		  ArchivePassword = Password
-		  
 		End Sub
 	#tag EndMethod
 
@@ -64,7 +63,6 @@ Inherits UnRAR.Iterator
 		  If DirPath = Nil Then DirPath = ""
 		  mLastError = RARProcessFile(mhandle, ProcessingMode, DirPath, FilePath)
 		  If mLastError = 0 Then
-		    ' probably should use RARHeaderDataEx
 		    Dim header As RARHeaderDataEx
 		    mLastError = RARReadHeaderEx(mHandle, header)
 		    Dim data As New MemoryBlock(header.Size)
@@ -105,6 +103,7 @@ Inherits UnRAR.Iterator
 		  mCurrentIndex = 0
 		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, mArchFile)
 		  mIsOpen = True
+		  mVolumeNumber = 1
 		End Sub
 	#tag EndMethod
 
@@ -139,7 +138,7 @@ Inherits UnRAR.Iterator
 		    Select Case UInt32(Param2)
 		    Case RAR_VOL_ASK
 		      If RaiseEvent ChangeVolume(mVolumeNumber + 1, f) Then
-		        If f <> Nil Then ' if f is nil and the event returned true then UnRAR should retry the expected path
+		        If f <> Nil Then ' if f is nil (or unchanged) and the event returned true then UnRAR should retry the expected path
 		          If Message = UCM_CHANGEVOLUMEW Then mb.WString(0) = f.AbsolutePath Else mb.CString(0) = f.AbsolutePath
 		        End If
 		        Return 1

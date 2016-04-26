@@ -71,6 +71,12 @@ Protected Class Iterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function IsOpen() As Boolean
+		  Return mIsOpen
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Function LastError() As Integer
 		  Return mLastError
 		End Function
@@ -122,7 +128,7 @@ Protected Class Iterator
 
 	#tag Method, Flags = &h1
 		Protected Sub OpenArchive()
-		  ' Opens the archive and moves the current index to 0. Only one 
+		  ' Opens the archive and moves the current index to 0. Only one
 		  ' instance may have an archive open at any given time.
 		  
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
@@ -151,6 +157,12 @@ Protected Class Iterator
 		  mCurrentItem = New UnRAR.ArchiveEntry(h, mCurrentIndex, mArchFile)
 		  mIsOpen = True
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Function OpenMode() As Integer
+		  Return mOpenMode
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
