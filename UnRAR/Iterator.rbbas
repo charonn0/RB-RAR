@@ -170,7 +170,6 @@ Protected Class Iterator
 	#tag Method, Flags = &h0
 		Sub Reset(StartIndex As Integer = 0)
 		  Me.Close
-		  Me.Constructor(mArchFile, mOpenMode)
 		  For i As Integer = 0 To StartIndex - 1
 		    If Not Me.MoveNext(RAR_SKIP) Then Exit For
 		  Next
