@@ -120,9 +120,12 @@ Inherits UnRAR.Iterator
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Reset()
+		Sub Reset(StartIndex As Integer = 0)
 		  Me.Close
 		  Me.Constructor(Me.ArchiveFile, mOpenMode, ArchivePassword)
+		  For i As Integer = 0 To StartIndex - 1
+		    If Not Me.MoveNext(RAR_SKIP) Then Exit For
+		  Next
 		End Sub
 	#tag EndMethod
 
