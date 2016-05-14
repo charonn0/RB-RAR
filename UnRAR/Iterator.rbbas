@@ -27,6 +27,8 @@ Protected Class Iterator
 		  
 		  If mIsOpen And mHandle <> 0 Then mLastError = RARCloseArchive(mHandle)
 		  mIsOpen = False
+		  mLastError = 0
+		  mHandle = 0
 		End Sub
 	#tag EndMethod
 
