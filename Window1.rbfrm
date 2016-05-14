@@ -60,7 +60,7 @@ Begin Window Window1
       ScrollbarHorizontal=   ""
       ScrollBarVertical=   True
       SelectionType   =   0
-      TabIndex        =   0
+      TabIndex        =   5
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -93,7 +93,7 @@ Begin Window Window1
       LockRight       =   True
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   1
+      TabIndex        =   0
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -121,7 +121,7 @@ Begin Window Window1
       LockRight       =   ""
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   4
+      TabIndex        =   8
       TabPanelIndex   =   0
       TextFont        =   "System"
       TextSize        =   0
@@ -151,7 +151,7 @@ Begin Window Window1
       Multiline       =   ""
       Scope           =   0
       Selectable      =   False
-      TabIndex        =   3
+      TabIndex        =   7
       TabPanelIndex   =   0
       Text            =   "No Archive"
       TextAlign       =   0
@@ -222,7 +222,7 @@ Begin Window Window1
       ScrollbarHorizontal=   ""
       ScrollBarVertical=   True
       SelectionType   =   0
-      TabIndex        =   2
+      TabIndex        =   6
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -255,7 +255,7 @@ Begin Window Window1
       LockRight       =   ""
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   5
+      TabIndex        =   1
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -286,7 +286,7 @@ Begin Window Window1
       LockRight       =   ""
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   6
+      TabIndex        =   2
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -317,7 +317,7 @@ Begin Window Window1
       LockRight       =   ""
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   7
+      TabIndex        =   4
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
@@ -348,7 +348,7 @@ Begin Window Window1
       LockRight       =   ""
       LockTop         =   True
       Scope           =   0
-      TabIndex        =   8
+      TabIndex        =   3
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "System"
