@@ -77,15 +77,10 @@ Protected Module UnRAR
 		  If Not israr Then
 		    bs.Position = 0
 		    If bs.Read(2) = "MZ" Then ' an EXE file, maybe a RAR SFX
-		      Dim mb As MemoryBlock = bs.Read(1024 * 1024)
-		      bs.Close
-		      bs = New BinaryStream(mb)
-		      Do Until bs.EOF
-		        If bs.Read(1) = "R" And bs.Read(1) = "a" And bs.Read(1) = "r" And bs.Read(1) = "!" Then
-		          israr = True
-		          Exit Do
-		        End If
-		      Loop
+		      ' read the first 1MB+256 of the file and grep for the signature. The rar documentation states: 
+		      ' "At the moment of writing this documentation RAR assumes the maximum SFX module size to not exceed 1 MB"
+		      Dim tmp As MemoryBlock = bs.Read(1024 * 1024 + 256)
+		      israr = (InStr(tmp, "Rar!") > 0)
 		    End If
 		  End If
 		  bs.Close
