@@ -12,39 +12,41 @@ The Iterator class implements the basic, older UnRAR interface. It does not supp
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim outputdir As FolderItem ' assume a valid directory
   Dim rar As New UnRAR.IteratorEx(archive)
-  Do Until Not rar.MoveNext(UnRAR.RAR_EXTRACT, outputdir)
-    App.YieldToNextThread
+  Do
+    If Not rar.MoveNext(UnRAR.RAR_EXTRACT, outputdir) Then Exit Do
   Loop
-  If rar.LastError <> UnRAR.ErrorEndArchive Then Raise New UnRAR.RARException(rar.LastError)
   rar.Close
 ```
 ###Extract a single file
 ```vbnet
   Dim index As Integer = 2 ' the third file in the archive
-  Do Until rar.CurrentItem.Index = index - 1
-    App.YieldToNextThread
-  Loop Until Not rar.MoveNext(UnRAR.RAR_SKIP)
-  If Not rar.MoveNext(UnRAR.RAR_EXTRACT, outputdir) Then Raise New UnRAR.RARException(rar.LastError)
+  Dim archive As FolderItem ' assume a valid RAR archive
+  Dim outputfile As FolderItem ' assume a valid, non-existing file
+  Dim rar As New UnRAR.IteratorEx(archive)
+  rar.Reset(index) ' move to the index
+  Call rar.MoveNext(UnRAR.RAR_EXTRACT, outputfile)
   rar.Close
 ```
 ###Test an entire archive
 ```vbnet
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim rar As New UnRAR.IteratorEx(archive)
-  Do Until Not rar.MoveNext(UnRAR.RAR_TEST)
-    App.YieldToNextThread
+  Do
+    If Not rar.MoveNext(UnRAR.RAR_TEST) Then Exit Do
   Loop
-  If rar.LastError <> UnRAR.ErrorEndArchive Then Raise New UnRAR.RARException(rar.LastError)
+  If rar.LastError <> UnRAR.ErrorEndArchive Then 
+    MsgBox("Test failed!")
+  End If
   rar.Close
 ```
 ###Test a single file
 ```vbnet
+  Dim index As Integer = 2 ' the third file in the archive
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim rar As New UnRAR.IteratorEx(archive)
-  Dim index As Integer = 2 ' the third file in the archive
-   Do Until rar.CurrentItem.Index = index - 1
-    App.YieldToNextThread
-  Loop Until Not rar.MoveNext(UnRAR.RAR_SKIP)
-  If Not rar.MoveNext(UnRAR.RAR_TEST) And rar.LastError <> UnRAR.ErrorEndArchive Then Raise New UnRAR.RARException(rar.LastError)
+  rar.Reset(index) ' move to the index  
+  If Not rar.MoveNext(UnRAR.RAR_TEST) And rar.LastError <> UnRAR.ErrorEndArchive Then 
+    MsgBox("Test failed!")
+  End If
   rar.Close
 ```
