@@ -50,3 +50,11 @@ The Iterator class implements the basic, older UnRAR interface. It does not supp
   End If
   rar.Close
 ```
+##How to incorporate RB-RAR into your Realbasic/Xojo project
+###Import the UnRAR module
+1. Download the RB-RAR project either in [ZIP archive format](https://github.com/charonn0/RB-RAR/archive/master.zip) or by cloning the repository with your Git client.
+2. Open the RB-RAR project in REALstudio or Xojo. Open your project in a separate window.
+3. Copy the UnRAR module into your project and save.
+
+###Ensure the UnRAR.dll shared library is installed
+You will need to ship the UnRAR.dll file with your application and install it into the same directory as your app. A pre-built Win32 DLL is available [here](http://www.rarlab.com/rar/UnRARDLL.exe), or you can [build it yourself from source](http://www.rarlab.com/rar/unrarsrc-5.3.11.tar.gz). 
