@@ -65,8 +65,6 @@ Inherits UnRAR.Iterator
 		  If mLastError = 0 Then
 		    Dim header As RARHeaderDataEx
 		    mLastError = RARReadHeaderEx(mHandle, header)
-		    Dim data As New MemoryBlock(header.Size)
-		    data.StringValue(0, header.Size) = header.StringValue(TargetLittleEndian)
 		    mCurrentIndex = mCurrentIndex + 1
 		    If mLastError = 0 Then mCurrentItem = New UnRAR.ArchiveEntry(header, mCurrentIndex, Me.ArchiveFile)
 		  End If
