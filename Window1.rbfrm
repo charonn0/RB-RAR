@@ -104,33 +104,6 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
-   Begin GroupBox GroupBox1
-      AutoDeactivate  =   True
-      Bold            =   ""
-      Caption         =   "Selected Item Properties"
-      Enabled         =   True
-      Height          =   263
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Italic          =   ""
-      Left            =   6
-      LockBottom      =   ""
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   ""
-      LockTop         =   True
-      Scope           =   0
-      TabIndex        =   8
-      TabPanelIndex   =   0
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   313
-      Underline       =   ""
-      Visible         =   True
-      Width           =   588
-   End
    Begin Label ArchivePath
       AutoDeactivate  =   True
       Bold            =   ""
@@ -185,55 +158,6 @@ Begin Window Window1
       Value           =   0
       Visible         =   True
       Width           =   600
-   End
-   Begin Listbox ItemDetail
-      AutoDeactivate  =   True
-      AutoHideScrollbars=   True
-      Bold            =   ""
-      Border          =   True
-      ColumnCount     =   2
-      ColumnsResizable=   ""
-      ColumnWidths    =   ""
-      DataField       =   ""
-      DataSource      =   ""
-      DefaultRowHeight=   -1
-      Enabled         =   True
-      EnableDrag      =   ""
-      EnableDragReorder=   ""
-      GridLinesHorizontal=   0
-      GridLinesVertical=   0
-      HasHeading      =   True
-      HeadingIndex    =   -1
-      Height          =   230
-      HelpTag         =   ""
-      Hierarchical    =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      InitialValue    =   "Property	Value"
-      Italic          =   ""
-      Left            =   20
-      LockBottom      =   True
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   True
-      LockTop         =   False
-      RequiresSelection=   ""
-      Scope           =   0
-      ScrollbarHorizontal=   ""
-      ScrollBarVertical=   True
-      SelectionType   =   0
-      TabIndex        =   6
-      TabPanelIndex   =   0
-      TabStop         =   True
-      TextFont        =   "System"
-      TextSize        =   0
-      TextUnit        =   0
-      Top             =   335
-      Underline       =   ""
-      UseFocusRing    =   True
-      Visible         =   True
-      Width           =   560
-      _ScrollWidth    =   -1
    End
    Begin PushButton TestItem
       AutoDeactivate  =   True
@@ -359,6 +283,215 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
+   Begin TabPanel TabPanel1
+      AutoDeactivate  =   True
+      Bold            =   ""
+      Enabled         =   True
+      Height          =   267
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   ""
+      Left            =   0
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      Panels          =   ""
+      Scope           =   0
+      SmallTabs       =   ""
+      TabDefinition   =   "Selected Item Info\rArchive Info"
+      TabIndex        =   9
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0
+      TextUnit        =   0
+      Top             =   318
+      Underline       =   ""
+      Value           =   1
+      Visible         =   True
+      Width           =   600
+      Begin Listbox ItemDetail
+         AutoDeactivate  =   True
+         AutoHideScrollbars=   True
+         Bold            =   ""
+         Border          =   True
+         ColumnCount     =   2
+         ColumnsResizable=   ""
+         ColumnWidths    =   ""
+         DataField       =   ""
+         DataSource      =   ""
+         DefaultRowHeight=   -1
+         Enabled         =   True
+         EnableDrag      =   ""
+         EnableDragReorder=   ""
+         GridLinesHorizontal=   0
+         GridLinesVertical=   0
+         HasHeading      =   True
+         HeadingIndex    =   -1
+         Height          =   229
+         HelpTag         =   ""
+         Hierarchical    =   ""
+         Index           =   -2147483648
+         InitialParent   =   "TabPanel1"
+         InitialValue    =   "Property	Value"
+         Italic          =   ""
+         Left            =   6
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   False
+         RequiresSelection=   ""
+         Scope           =   0
+         ScrollbarHorizontal=   ""
+         ScrollBarVertical=   True
+         SelectionType   =   0
+         TabIndex        =   0
+         TabPanelIndex   =   1
+         TabStop         =   True
+         TextFont        =   "System"
+         TextSize        =   0
+         TextUnit        =   0
+         Top             =   349
+         Underline       =   ""
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   588
+         _ScrollWidth    =   -1
+      End
+      Begin Listbox ArchiveDetail
+         AutoDeactivate  =   True
+         AutoHideScrollbars=   True
+         Bold            =   ""
+         Border          =   True
+         ColumnCount     =   2
+         ColumnsResizable=   ""
+         ColumnWidths    =   ""
+         DataField       =   ""
+         DataSource      =   ""
+         DefaultRowHeight=   -1
+         Enabled         =   True
+         EnableDrag      =   ""
+         EnableDragReorder=   ""
+         GridLinesHorizontal=   0
+         GridLinesVertical=   0
+         HasHeading      =   True
+         HeadingIndex    =   -1
+         Height          =   89
+         HelpTag         =   ""
+         Hierarchical    =   ""
+         Index           =   -2147483648
+         InitialParent   =   "TabPanel1"
+         InitialValue    =   "Property	Value"
+         Italic          =   ""
+         Left            =   5
+         LockBottom      =   True
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   True
+         LockTop         =   False
+         RequiresSelection=   ""
+         Scope           =   0
+         ScrollbarHorizontal=   ""
+         ScrollBarVertical=   True
+         SelectionType   =   0
+         TabIndex        =   0
+         TabPanelIndex   =   2
+         TabStop         =   True
+         TextFont        =   "System"
+         TextSize        =   0
+         TextUnit        =   0
+         Top             =   350
+         Underline       =   ""
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   588
+         _ScrollWidth    =   -1
+      End
+      Begin Label Label1
+         AutoDeactivate  =   True
+         Bold            =   ""
+         DataField       =   ""
+         DataSource      =   ""
+         Enabled         =   True
+         Height          =   20
+         HelpTag         =   ""
+         Index           =   -2147483648
+         InitialParent   =   "TabPanel1"
+         Italic          =   ""
+         Left            =   6
+         LockBottom      =   ""
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   ""
+         LockTop         =   True
+         Multiline       =   ""
+         Scope           =   0
+         Selectable      =   False
+         TabIndex        =   1
+         TabPanelIndex   =   2
+         Text            =   "Archive comment:"
+         TextAlign       =   0
+         TextColor       =   &h000000
+         TextFont        =   "System"
+         TextSize        =   0
+         TextUnit        =   0
+         Top             =   451
+         Transparent     =   True
+         Underline       =   ""
+         Visible         =   True
+         Width           =   100
+      End
+      Begin TextArea ArchComment
+         AcceptTabs      =   ""
+         Alignment       =   0
+         AutoDeactivate  =   True
+         AutomaticallyCheckSpelling=   True
+         BackColor       =   &hFFFFFF
+         Bold            =   ""
+         Border          =   True
+         DataField       =   ""
+         DataSource      =   ""
+         Enabled         =   True
+         Format          =   ""
+         Height          =   91
+         HelpTag         =   ""
+         HideSelection   =   True
+         Index           =   -2147483648
+         InitialParent   =   "TabPanel1"
+         Italic          =   ""
+         Left            =   10
+         LimitText       =   0
+         LockBottom      =   ""
+         LockedInPosition=   False
+         LockLeft        =   True
+         LockRight       =   ""
+         LockTop         =   True
+         Mask            =   ""
+         Multiline       =   True
+         ReadOnly        =   True
+         Scope           =   0
+         ScrollbarHorizontal=   ""
+         ScrollbarVertical=   True
+         Styled          =   True
+         TabIndex        =   2
+         TabPanelIndex   =   2
+         TabStop         =   True
+         Text            =   ""
+         TextColor       =   &h000000
+         TextFont        =   "System"
+         TextSize        =   0
+         TextUnit        =   0
+         Top             =   474
+         Underline       =   ""
+         UseFocusRing    =   True
+         Visible         =   True
+         Width           =   574
+      End
+   End
 End
 #tag EndWindow
 
@@ -412,6 +545,10 @@ End
 
 	#tag Property, Flags = &h21
 		Private SizeAll As UInt64
+	#tag EndProperty
+
+	#tag Property, Flags = &h1
+		Protected SizeCompressed As UInt64
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -504,7 +641,7 @@ End
 #tag Events OpenRAR
 	#tag Event
 		Sub Action()
-		  If Not UnRAR.IsAvailable Then 
+		  If Not UnRAR.IsAvailable Then
 		    MsgBox(UnRAR.FormatError(UnRAR.ErrorRARUnavailable))
 		    Return
 		  End If
@@ -525,12 +662,14 @@ End
 		  Count = 0
 		  SizeAll = 0
 		  SizeNow = 0
+		  SizeCompressed = 0
 		  
 		  Do
 		    Dim d, sz, p As String
 		    d = Archive.CurrentItem.FileTime.SQLDateTime
 		    If Not Archive.CurrentItem.Directory Then
 		      SizeAll = SizeAll + Archive.CurrentItem.UnpackedSize
+		      SizeCompressed = SizeCompressed + Archive.CurrentItem.PackedSize
 		      sz = Format(Archive.CurrentItem.UnpackedSize, "###,###,###,###")
 		      p = Format(Archive.CurrentItem.PackedSize * 100 /Archive.CurrentItem.UnpackedSize, "#0.0#\%")
 		    End If
@@ -540,8 +679,25 @@ End
 		    ArchList.RowTag(ArchList.LastIndex) = Archive.CurrentItem
 		    count = count + 1
 		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
-		  
+		  ArchComment.Text = Archive.ArchiveComment
+		  ArchiveDetail.DeleteAllRows
+		  Dim a As UnRAR.ArchiveEntry
+		  Try
+		    a = ArchList.RowTag(0)
+		    ArchiveDetail.AddRow("Archive", Archive.ArchiveFile.AbsolutePath)
+		    ArchiveDetail.AddRow("Total files", Format(count, "###,###,##0"))
+		    ArchiveDetail.AddRow("Total size", Format(SizeAll, "###,###,###,###,##0"))
+		    ArchiveDetail.AddRow("Packed size", Format(SizeCompressed, "###,###,###,###,##0"))
+		    ArchiveDetail.AddRow("Compression ratio", Format(SizeCompressed * 100 / SizeAll, "##0.0#") + "%")
+		    ArchiveDetail.AddRow("Solid", Str(a.IsSolid))
+		    ArchiveDetail.AddRow("Encrypted", Str(a.IsEncrypted))
+		    ArchiveDetail.AddRow("Host OS", a.HostOS)
+		  Catch
+		    //meh
+		  End Try
 		  Archive.Reset()
+		  
+		  
 		  Self.Title = "UnRar demo - " + rar.Name + "(" + Format(count, "###,###,##0") + " items)"
 		  ExtractAll.Enabled = True
 		  ExtractItem.Enabled = False
