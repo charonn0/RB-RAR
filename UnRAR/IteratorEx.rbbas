@@ -10,10 +10,7 @@ Inherits UnRAR.Iterator
 
 	#tag Method, Flags = &h0
 		Sub Constructor(RARFile As FolderItem, Mode As Integer = UnRAR.RAR_OM_EXTRACT, Password As String = "")
-		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
-		  mArchFile = RARFile
-		  mOpenMode = Mode
-		  ArchivePassword = Password
+		  Super.Constructor(RARFile, Mode, Password)
 		End Sub
 	#tag EndMethod
 
@@ -75,6 +72,10 @@ Inherits UnRAR.Iterator
 
 	#tag Method, Flags = &h1
 		Protected Sub OpenArchive()
+		  ' Opens the archive and moves the current index to 0. Only one
+		  ' instance may have an archive open at any given time.
+		  
+		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mCommentBuffer = New MemoryBlock(260 * 2)
 		  Dim path As New MemoryBlock(mArchFile.AbsolutePath.LenB * 2 + 2)
 		  Static UserData As Integer
