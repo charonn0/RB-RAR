@@ -707,9 +707,9 @@ End
 		  
 		Exception Err As RuntimeException
 		  If Archive <> Nil And Archive.LastError <> 0 Then
-		    MsgBox("RAR error: " + Str(Archive.LastError) + " " + UnRAR.FormatError(Archive.LastError))
+		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  Else
-		    MsgBox("RAR error: " + Str(Err.ErrorNumber) + " " + UnRAR.FormatError(Err.ErrorNumber))
+		    MsgBox("RAR error " + Str(Err.ErrorNumber) + ": " + UnRAR.FormatError(Err.ErrorNumber))
 		  End If
 		  
 		  
