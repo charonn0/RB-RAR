@@ -72,18 +72,24 @@ Protected Module UnRAR
 
 	#tag Method, Flags = &h0
 		Function IsRARArchive(Extends Arch As FolderItem) As Boolean
+		  ' Returns True if the file is probably a RAR archive.
+		  
 		  Dim bs As BinaryStream = BinaryStream.Open(Arch)
-		  Dim israr As Boolean = (bs.Read(4) = "Rar!")
-		  If Not israr Then
-		    bs.Position = 0
-		    If bs.Read(2) = "MZ" Then ' an EXE file, maybe a RAR SFX
-		      ' read the first 1MB+256 of the file and grep for the signature. The rar documentation states: 
-		      ' "At the moment of writing this documentation RAR assumes the maximum SFX module size to not exceed 1 MB"
-		      Dim tmp As MemoryBlock = bs.Read(1024 * 1024 + 256)
-		      israr = (InStr(tmp, "Rar!") > 0)
+		  Dim israr As Boolean
+		  Try
+		    israr = (bs.Read(4) = "Rar!")
+		    If Not israr Then
+		      bs.Position = 0
+		      If bs.Read(2) = "MZ" Then ' an EXE file, maybe a RAR SFX
+		        ' read the first 1MB+256 of the file and grep for the signature. The rar documentation states:
+		        ' "At the moment of writing this documentation RAR assumes the maximum SFX module size to not exceed 1 MB"
+		        Dim tmp As MemoryBlock = bs.Read(1024 * 1024 + 256)
+		        israr = (InStr(tmp, "Rar!") > 0)
+		      End If
 		    End If
-		  End If
-		  bs.Close
+		  Finally
+		    bs.Close
+		  End Try
 		  Return israr
 		  
 		Exception err As RuntimeException
