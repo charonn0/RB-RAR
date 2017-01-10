@@ -1,13 +1,13 @@
-This project implements bindings for RealStudio and Xojo Win32 applications to extract RAR archives 
-using the [official unrar library](http://www.rarlab.com/rar/UnRARDLL.exe). The `unrar.dll` file 
-must be stored on Windows' search path or in the same directory as your executable.
+##Introduction
+**UnRAR** is the official library from RARLabs for extracting [WinRAR archives](http://www.rarlab.com/rar_archiver.htm). This project implements UnRAR bindings for RealStudio and Xojo Win32 applications. Creating archives is not supported by the library.
 
+##Synopsis
 The project consists of a [module](https://github.com/charonn0/RB-RAR/wiki/Unrar-module) containing three classes: [Iterator](https://github.com/charonn0/RB-RAR/wiki/UnRAR.Iterator), [IteratorEx](https://github.com/charonn0/RB-RAR/wiki/UnRAR.IteratorEx), and [ArchiveEntry](https://github.com/charonn0/RB-RAR/wiki/UnRAR.ArchiveEntry).
 
-The Iterator class implements the basic, older UnRAR interface. It does not support Unicode filenames, archives with encrypted headers, or extracting into memory. For almost all archives you should prefer the IteratorEx class.
+The `Iterator` class implements the basic, older UnRAR interface. It does not support Unicode filenames, archives with encrypted headers, or extracting into memory. For almost all archives you should prefer the `IteratorEx` class.
 
-##Examples
-###Extract an entire archive
+##Example
+###This example extracts an entire RAR archive into a directory
 ```vbnet
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim outputdir As FolderItem ' assume a valid directory
@@ -17,6 +17,17 @@ The Iterator class implements the basic, older UnRAR interface. It does not supp
   Loop
   rar.Close
 ```
+
+##How to incorporate RB-RAR into your Realbasic/Xojo project
+###Import the UnRAR module
+1. Download the RB-RAR project either in [ZIP archive format](https://github.com/charonn0/RB-RAR/archive/master.zip) or by cloning the repository with your Git client.
+2. Open the RB-RAR project in REALstudio or Xojo. Open your project in a separate window.
+3. Copy the UnRAR module into your project and save.
+
+###Ensure the UnRAR.dll shared library is installed
+You will need to ship the UnRAR.dll file with your application and install it into the same directory as your app. A pre-built Win32 DLL is available [here](http://www.rarlab.com/rar/UnRARDLL.exe), or you can [build it yourself from source](http://www.rarlab.com/rar/unrarsrc-5.3.11.tar.gz). 
+
+##More examples
 ###Extract a single file
 ```vbnet
   Dim index As Integer = 2 ' the third file in the archive
@@ -50,11 +61,3 @@ The Iterator class implements the basic, older UnRAR interface. It does not supp
   End If
   rar.Close
 ```
-##How to incorporate RB-RAR into your Realbasic/Xojo project
-###Import the UnRAR module
-1. Download the RB-RAR project either in [ZIP archive format](https://github.com/charonn0/RB-RAR/archive/master.zip) or by cloning the repository with your Git client.
-2. Open the RB-RAR project in REALstudio or Xojo. Open your project in a separate window.
-3. Copy the UnRAR module into your project and save.
-
-###Ensure the UnRAR.dll shared library is installed
-You will need to ship the UnRAR.dll file with your application and install it into the same directory as your app. A pre-built Win32 DLL is available [here](http://www.rarlab.com/rar/UnRARDLL.exe), or you can [build it yourself from source](http://www.rarlab.com/rar/unrarsrc-5.3.11.tar.gz). 
