@@ -29,7 +29,7 @@ Inherits UnRAR.Iterator
 		Function MoveNext(ProcessingMode As Integer, ExtractPath As FolderItem = Nil) As Boolean
 		  ' Calling this method will apply the ProcessingMode to the CurrentItem and advance the CurrentItem by one.
 		  ' Returns true if ProcessingMode was applied and the next item was loaded. Returns False on error or end-of-archive;
-		  ' check ArchiveIterator.LastError for details.
+		  ' check IteratorEx.LastError for details.
 		  ' If ProcessingMode is RAR_EXTRACT then pass a FolderItem to extract into. Pass a directory to extract the item into
 		  ' the directory using the item name (automatically creating subdirectories as needed); pass a non-existing file to extract
 		  ' directly into the file.
