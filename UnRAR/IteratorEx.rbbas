@@ -70,6 +70,21 @@ Inherits UnRAR.Iterator
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function MoveNext(WriteTo As Writeable) As Boolean
+		  mExtractionStream = WriteTo
+		  Dim ok As Boolean
+		  Try
+		    ok = Me.MoveNext(RAR_TEST)
+		  Catch
+		    ok = False
+		  Finally
+		    mExtractionStream = Nil
+		  End Try
+		  Return ok
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Sub OpenArchive()
 		  ' Opens the archive and moves the current index to 0. Only one
@@ -157,7 +172,14 @@ Inherits UnRAR.Iterator
 		    End Select
 		    
 		  Case UCM_PROCESSDATA
-		    If Not RaiseEvent ProcessData(Param1, Integer(Param2)) Then Return 1
+		    Dim data As MemoryBlock = Param1
+		    Dim length As Integer = Integer(Param2)
+		    If mExtractionStream <> Nil Then
+		      mExtractionStream.Write(data.StringValue(0, length))
+		      Return 0
+		    Else
+		      If Not RaiseEvent ProcessData(Param1, Integer(Param2)) Then Return 1
+		    End If
 		    Return -1 ' abort
 		    
 		  Case UCM_NEEDPASSWORD, UCM_NEEDPASSWORDW
@@ -199,6 +221,10 @@ Inherits UnRAR.Iterator
 
 	#tag Property, Flags = &h21
 		Private mArchiveHeader As RAROpenArchiveDataEx
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mExtractionStream As Writeable
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
