@@ -20,7 +20,7 @@ Begin Window Window1
    MinimizeButton  =   True
    MinWidth        =   64
    Placement       =   2
-   Resizeable      =   False
+   Resizeable      =   True
    Title           =   "UnRar demo"
    Visible         =   True
    Width           =   6.0e+2
@@ -30,7 +30,7 @@ Begin Window Window1
       Bold            =   ""
       Border          =   True
       ColumnCount     =   3
-      ColumnsResizable=   ""
+      ColumnsResizable=   True
       ColumnWidths    =   "50%,25%,25%"
       DataField       =   ""
       DataSource      =   ""
@@ -492,6 +492,61 @@ Begin Window Window1
          Width           =   574
       End
    End
+   Begin Timer CompleteTimer
+      Height          =   32
+      Index           =   -2147483648
+      Left            =   612
+      LockedInPosition=   False
+      Mode            =   0
+      Period          =   1
+      Scope           =   0
+      TabPanelIndex   =   0
+      Top             =   -10
+      Width           =   32
+   End
+   Begin Timer ProgressTimer
+      Height          =   32
+      Index           =   -2147483648
+      Left            =   612
+      LockedInPosition=   False
+      Mode            =   0
+      Period          =   200
+      Scope           =   0
+      TabPanelIndex   =   0
+      Top             =   23
+      Width           =   32
+   End
+   Begin PushButton AbortBtn
+      AutoDeactivate  =   True
+      Bold            =   ""
+      ButtonStyle     =   0
+      Cancel          =   ""
+      Caption         =   "Abort"
+      Default         =   ""
+      Enabled         =   True
+      Height          =   22
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Italic          =   ""
+      Left            =   180
+      LockBottom      =   ""
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   ""
+      LockTop         =   True
+      Scope           =   0
+      TabIndex        =   10
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "System"
+      TextSize        =   0
+      TextUnit        =   0
+      Top             =   274
+      Underline       =   ""
+      Visible         =   False
+      Width           =   80
+   End
 End
 #tag EndWindow
 
@@ -522,6 +577,54 @@ End
 	#tag EndMethod
 
 	#tag Method, Flags = &h21
+		Private Sub RunExtractAll(Sender As Thread)
+		  #pragma Unused Sender
+		  Do
+		    mCurrentIndex = mCurrentIndex + 1
+		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, mOutputDir) Then Exit Do
+		    App.YieldToNextThread
+		  Loop Until Archive.LastError <> 0
+		  CompleteTimer.Mode = Timer.ModeSingle
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub RunExtractSingle(Sender As Thread)
+		  #pragma Unused Sender
+		  
+		  Do Until Archive.CurrentItem.Index = mSelectedIndex
+		    mCurrentIndex = mCurrentIndex + 1
+		    App.YieldToNextThread
+		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
+		  Call Archive.MoveNext(UnRAR.RAR_Extract, mOutputDir)
+		  CompleteTimer.Mode = Timer.ModeSingle
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub RunTestAll(Sender As Thread)
+		  #pragma Unused Sender
+		  Do
+		    mCurrentIndex = mCurrentIndex + 1
+		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then Exit Do
+		  Loop
+		  CompleteTimer.Mode = Timer.ModeSingle
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub RunTestSingle(Sender As Thread)
+		  #pragma Unused Sender
+		  
+		  Do Until Archive.CurrentItem.Index = mSelectedIndex
+		    mCurrentIndex = mCurrentIndex + 1
+		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
+		  Call Archive.MoveNext(UnRAR.RAR_TEST)
+		  CompleteTimer.Mode = Timer.ModeSingle
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
 		Private Function VolumeChangedHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
 		  #pragma Unused Sender
 		  #If DebugBuild Then
@@ -544,6 +647,22 @@ End
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
+		Private mCurrentIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mOutputDir As FolderItem
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mSelectedIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mWorker As Thread
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Private SizeAll As UInt64
 	#tag EndProperty
 
@@ -562,7 +681,8 @@ End
 	#tag Event
 		Sub Change()
 		  ItemDetail.DeleteAllRows
-		  If Me.ListIndex > -1 Then
+		  mCurrentIndex = Me.ListIndex
+		  If mCurrentIndex > -1 Then
 		    Dim item As UnRAR.ArchiveEntry = Me.RowTag(Me.ListIndex)
 		    If item = Nil Then Return
 		    ItemDetail.AddRow("File Name",  item.FileName)
@@ -722,22 +842,13 @@ End
 	#tag Event
 		Sub Action()
 		  ProgressBar1.Value = 0
-		  SizeNow = 0
+		  mCurrentIndex = 0
 		  Dim item As UnRAR.ArchiveEntry = ArchList.RowTag(ArchList.ListIndex)
 		  If item = Nil Then Return
 		  
-		  Do Until Archive.CurrentItem.Index = item.Index
-		    App.YieldToNextThread
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
-		  
-		  If Archive.MoveNext(UnRAR.RAR_TEST) Or Archive.LastError = UnRAR.ErrorEndArchive Then
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		    MsgBox("Test OK")
-		  Else
-		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
-		  End If
-		  Archive.Reset()
+		  mWorker = New Thread
+		  AddHandler mWorker.Run, WeakAddressOf RunTestSingle
+		  mWorker.Run()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
@@ -745,33 +856,59 @@ End
 	#tag Event
 		Sub Action()
 		  ProgressBar1.Value = 0
-		  SizeNow = 0
-		  Do
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		    If Not Archive.MoveNext(UnRAR.RAR_TEST) Then Exit Do
-		  Loop
-		  If Archive.LastError = UnRAR.ErrorEndArchive Then
-		    MsgBox("Test OK")
-		  Else
-		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
-		  End If
-		  Archive.Reset()
+		  mCurrentIndex = 0
+		  ProgressTimer.Mode = Timer.ModeMultiple
+		  
+		  mWorker = New Thread
+		  AddHandler mWorker.Run, WeakAddressOf RunTestAll
+		  mWorker.Run()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
 #tag Events ExtractAll
 	#tag Event
 		Sub Action()
+		  mOutputDir = SelectFolder()
+		  If mOutputDir = Nil Then Return
+		  
 		  ProgressBar1.Value = 0
-		  SizeNow = 0
-		  Dim f As FolderItem = SelectFolder()
-		  If f = Nil Then Return
-		  Do
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		    If Not Archive.MoveNext(UnRAR.RAR_EXTRACT, f) Then Exit Do
-		  Loop Until Archive.LastError <> 0
-		  If Archive.LastError = UnRAR.ErrorEndArchive Then
-		    MsgBox("Extract OK")
+		  mCurrentIndex = 0
+		  ProgressTimer.Mode = Timer.ModeMultiple
+		  
+		  mWorker = New Thread
+		  mWorker.Priority = Thread.HighPriority
+		  AddHandler mWorker.Run, WeakAddressOf RunExtractAll
+		  mWorker.Run()
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ExtractItem
+	#tag Event
+		Sub Action()
+		  Dim item As UnRAR.ArchiveEntry = ArchList.RowTag(ArchList.ListIndex)
+		  If item = Nil Then Return
+		  mOutputDir = GetSaveFolderItem("", item.FileName)
+		  If mOutputDir = Nil Then Return
+		  
+		  ProgressBar1.Value = 0
+		  mCurrentIndex = 0
+		  ProgressTimer.Mode = Timer.ModeMultiple
+		  
+		  mWorker = New Thread
+		  AddHandler mWorker.Run, WeakAddressOf RunExtractSingle
+		  mWorker.Run()
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events CompleteTimer
+	#tag Event
+		Sub Action()
+		  ProgressBar1.Value = 0
+		  ProgressTimer.Mode = Timer.ModeOff
+		  AbortBtn.Visible = False
+		  mWorker = Nil
+		  If Archive.LastError = UnRAR.ErrorEndArchive Or Archive.LastError = 0 Then
+		    MsgBox("Operation succeeded.")
 		  Else
 		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
 		  End If
@@ -779,27 +916,21 @@ End
 		End Sub
 	#tag EndEvent
 #tag EndEvents
-#tag Events ExtractItem
+#tag Events ProgressTimer
 	#tag Event
 		Sub Action()
-		  ProgressBar1.Value = 0
-		  SizeNow = 0
-		  Dim item As UnRAR.ArchiveEntry = ArchList.RowTag(ArchList.ListIndex)
-		  If item = Nil Then Return
-		  Dim f As FolderItem = GetSaveFolderItem("", item.FileName)
-		  If f = Nil Then Return
-		  
-		  Do Until Archive.CurrentItem.Index = item.Index
-		    App.YieldToNextThread
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		  Loop Until Not Archive.MoveNext(UnRAR.RAR_SKIP)
-		  If Archive.MoveNext(UnRAR.RAR_Extract, f) Or Archive.LastError = UnRAR.ErrorEndArchive Then
-		    ProgressBar1.Value = ProgressBar1.Value + 1
-		    MsgBox("Extract OK")
-		  Else
-		    MsgBox("RAR error " + Str(Archive.LastError) + ": " + UnRAR.FormatError(Archive.LastError))
+		  ProgressBar1.Value = mCurrentIndex * 100 / Count
+		  AbortBtn.Visible = True
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events AbortBtn
+	#tag Event
+		Sub Action()
+		  If mWorker <> Nil Then
+		    mWorker.Kill
+		    CompleteTimer.Mode = Timer.ModeSingle
 		  End If
-		  Archive.Reset()
 		End Sub
 	#tag EndEvent
 #tag EndEvents
