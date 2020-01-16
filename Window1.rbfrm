@@ -628,7 +628,7 @@ End
 		Private Function VolumeChangedHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, NextVolume As FolderItem) As Boolean
 		  #pragma Unused Sender
 		  #If DebugBuild Then
-		    System.DebugLog("Changed volume to #" + Str(VolumeNumber) + "(" + NextVolume.AbsolutePath + ")")
+		    System.DebugLog("Changed volume to #" + Str(VolumeNumber) + "(" + NextVolume.AbsolutePath_ + ")")
 		  #endif
 		End Function
 	#tag EndMethod
@@ -687,7 +687,7 @@ End
 		    If item = Nil Then Return
 		    ItemDetail.AddRow("File Name",  item.FileName)
 		    ItemDetail.AddRow("Time",  item.FileTime.SQLDateTime)
-		    ItemDetail.AddRow("Archive", item.RARFile.AbsolutePath)
+		    ItemDetail.AddRow("Archive", item.RARFile.AbsolutePath_)
 		    ItemDetail.AddRow("Volume", item.VolumeName)
 		    ItemDetail.AddRow("Comment",  item.Comment)
 		    ItemDetail.AddRow("Packed size",  Format(item.PackedSize, "###,###,###,###"))
@@ -772,7 +772,7 @@ End
 		  End If
 		  
 		  ArchList.DeleteAllRows
-		  ArchivePath.Text = rar.AbsolutePath
+		  ArchivePath.Text = rar.AbsolutePath_
 		  If Archive <> Nil Then Archive.Close
 		  Archive = New UnRAR.IteratorEx(rar)
 		  AddHandler Archive.GetPassword, WeakAddressOf GetPasswordHandler
@@ -804,7 +804,7 @@ End
 		  Dim a As UnRAR.ArchiveEntry
 		  Try
 		    a = ArchList.RowTag(0)
-		    ArchiveDetail.AddRow("Archive", Archive.ArchiveFile.AbsolutePath)
+		    ArchiveDetail.AddRow("Archive", Archive.ArchiveFile.AbsolutePath_)
 		    ArchiveDetail.AddRow("Total files", Format(count, "###,###,##0"))
 		    ArchiveDetail.AddRow("Total size", Format(SizeAll, "###,###,###,###,##0"))
 		    ArchiveDetail.AddRow("Packed size", Format(SizeCompressed, "###,###,###,###,##0"))

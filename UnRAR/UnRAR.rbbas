@@ -1,5 +1,15 @@
 #tag Module
 Protected Module UnRAR
+	#tag Method, Flags = &h0
+		Function AbsolutePath_(Extends f As FolderItem) As String
+		  #If RBVersion > 2019 Then
+		    Return f.NativePath
+		  #Else
+		    Return f.AbsolutePath
+		  #endif
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Sub ExtractArchive(RARFile As FolderItem, Destination As FolderItem, Password As String = "", ArchiveIndex As Integer = - 1)
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException

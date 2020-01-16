@@ -106,11 +106,11 @@ Protected Class Iterator
 		    FilePath = Nil
 		    DirPath = Nil
 		  Case ExtractPath.Directory And ExtractPath.Exists
-		    DirPath = New MemoryBlock(ExtractPath.AbsolutePath.LenB * 2)
-		    DirPath.CString(0) = ExtractPath.AbsolutePath + Chr(0)
+		    DirPath = New MemoryBlock(ExtractPath.AbsolutePath_.LenB * 2)
+		    DirPath.CString(0) = ExtractPath.AbsolutePath_ + Chr(0)
 		  Else
-		    FilePath = New MemoryBlock(ExtractPath.AbsolutePath.LenB * 2)
-		    FilePath.CString(0) = ExtractPath.AbsolutePath + Chr(0)
+		    FilePath = New MemoryBlock(ExtractPath.AbsolutePath_.LenB * 2)
+		    FilePath.CString(0) = ExtractPath.AbsolutePath_ + Chr(0)
 		  End Select
 		  If FilePath = Nil Then FilePath = ""
 		  If DirPath = Nil Then DirPath = ""
@@ -135,8 +135,8 @@ Protected Class Iterator
 		  
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mCommentBuffer = New MemoryBlock(260 * 2)
-		  Dim path As New MemoryBlock(mArchFile.AbsolutePath.LenB + 1)
-		  path.CString(0) = mArchFile.AbsolutePath
+		  Dim path As New MemoryBlock(mArchFile.AbsolutePath_.LenB + 1)
+		  path.CString(0) = mArchFile.AbsolutePath_
 		  mArchiveHeader.CommentBufferSize = mCommentBuffer.Size
 		  mArchiveHeader.Comments = mCommentBuffer
 		  mArchiveHeader.ArchiveName = path

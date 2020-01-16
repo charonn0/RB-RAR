@@ -338,7 +338,7 @@ End
 		  mLocation = ExpectedLocation
 		  VolumeNum.Text = Str(VolumeNumber)
 		  ArchName.Text = ArchiveName
-		  Location.Text = ExpectedLocation.AbsolutePath
+		  Location.Text = ExpectedLocation.AbsolutePath_
 		  Self.ShowModal
 		  Return mLocation
 		End Function
@@ -365,7 +365,7 @@ End
 		  Dim f As FolderItem = dlg.ShowModal
 		  If f <> Nil Then
 		    mLocation = f
-		    Location.Text = mLocation.AbsolutePath
+		    Location.Text = mLocation.AbsolutePath_
 		  End If
 		End Sub
 	#tag EndEvent

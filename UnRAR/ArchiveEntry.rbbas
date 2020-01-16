@@ -167,7 +167,7 @@ Protected Class ArchiveEntry
 	#tag Method, Flags = &h0
 		Function Operator_Compare(OtherItem As ArchiveEntry) As Integer
 		  If OtherItem Is Nil Then Return -1
-		  If OtherItem.RARFile.AbsolutePath <> Me.RARFile.AbsolutePath Then Return -1
+		  If OtherItem.RARFile.AbsolutePath_ <> Me.RARFile.AbsolutePath_ Then Return -1
 		  If OtherItem.Index <> Me.Index Then Return 1
 		  Return 0
 		End Function

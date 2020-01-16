@@ -50,11 +50,11 @@ Inherits UnRAR.Iterator
 		    FilePath = Nil
 		    DirPath = Nil
 		  Case ExtractPath.Directory And ExtractPath.Exists
-		    DirPath = New MemoryBlock(ExtractPath.AbsolutePath.LenB * 2)
-		    DirPath.CString(0) = ExtractPath.AbsolutePath + Chr(0)
+		    DirPath = New MemoryBlock(ExtractPath.AbsolutePath_.LenB * 2)
+		    DirPath.CString(0) = ExtractPath.AbsolutePath_ + Chr(0)
 		  Else
-		    FilePath = New MemoryBlock(ExtractPath.AbsolutePath.LenB * 2)
-		    FilePath.CString(0) = ExtractPath.AbsolutePath + Chr(0)
+		    FilePath = New MemoryBlock(ExtractPath.AbsolutePath_.LenB * 2)
+		    FilePath.CString(0) = ExtractPath.AbsolutePath_ + Chr(0)
 		  End Select
 		  If FilePath = Nil Then FilePath = ""
 		  If DirPath = Nil Then DirPath = ""
@@ -92,13 +92,13 @@ Inherits UnRAR.Iterator
 		  
 		  If Not UnRAR.IsAvailable Then Raise New PlatformNotSupportedException
 		  mCommentBuffer = New MemoryBlock(260 * 2)
-		  Dim path As New MemoryBlock(mArchFile.AbsolutePath.LenB * 2 + 2)
+		  Dim path As New MemoryBlock(mArchFile.AbsolutePath_.LenB * 2 + 2)
 		  Static UserData As Integer
 		  UserData = UserData + 1
 		  Dim UserDatum As Integer = UserData
 		  If Instances = Nil Then Instances = New Dictionary
 		  Instances.Value(UserDatum) = New WeakRef(Me)
-		  path.WString(0) = mArchFile.AbsolutePath
+		  path.WString(0) = mArchFile.AbsolutePath_
 		  mArchiveHeader.CommentBufferSize = mCommentBuffer.Size
 		  mArchiveHeader.Comments = mCommentBuffer
 		  mArchiveHeader.ArchiveNameW = path
@@ -151,11 +151,16 @@ Inherits UnRAR.Iterator
 		    If Message = UCM_CHANGEVOLUMEW Then path = mb.WString(0) Else path = mb.CString(0)
 		    Dim f As FolderItem = GetFolderItem(path)
 		    
-		    Select Case UInt32(Param2)
+		    #If Target64Bit Then
+		      Dim p As UInt64 = UInt64(Param2)
+		    #Else
+		      Dim p As UInt32 = UInt32(Param2)
+		    #endif
+		    Select Case p
 		    Case RAR_VOL_ASK
 		      If RaiseEvent ChangeVolume(mVolumeNumber + 1, f) Then
 		        If f <> Nil Then ' if f is nil (or unchanged) and the event returned true then UnRAR should retry the expected path
-		          If Message = UCM_CHANGEVOLUMEW Then mb.WString(0) = f.AbsolutePath Else mb.CString(0) = f.AbsolutePath
+		          If Message = UCM_CHANGEVOLUMEW Then mb.WString(0) = f.AbsolutePath_ Else mb.CString(0) = f.AbsolutePath_
 		        End If
 		        Return 1
 		      End If
