@@ -547,15 +547,50 @@ Begin Window Window1
       Visible         =   False
       Width           =   80
    End
+   Begin Timer GetPasswordTimer
+      Height          =   32
+      Index           =   -2147483648
+      Left            =   880
+      LockedInPosition=   False
+      Mode            =   0
+      Period          =   1
+      Scope           =   0
+      TabPanelIndex   =   0
+      Top             =   29
+      Width           =   32
+   End
+   Begin Timer ChangeVolumeTimer
+      Height          =   32
+      Index           =   -2147483648
+      Left            =   880
+      LockedInPosition=   False
+      Mode            =   0
+      Period          =   1
+      Scope           =   0
+      TabPanelIndex   =   0
+      Top             =   67
+      Width           =   32
+   End
 End
 #tag EndWindow
 
 #tag WindowCode
 	#tag Method, Flags = &h21
 		Private Function ChangeVolumeHandler(Sender As UnRAR.IteratorEx, VolumeNumber As Integer, ByRef NextVolume As FolderItem) As Boolean
-		  Dim f As FolderItem = RARVolumeSelect.GetVolume(Sender.ArchiveFile.Name, VolumeNumber, NextVolume)
-		  If f <> Nil Then
-		    NextVolume = f
+		  If App.CurrentThread = Nil Then
+		    mNextVolume = RARVolumeSelect.GetVolume(Sender.ArchiveFile.Name, VolumeNumber, NextVolume)
+		  Else
+		    mVolumeNumber = VolumeNumber
+		    mNextVolume = NextVolume
+		    mWaiting = True
+		    ChangeVolumeTimer.Mode = Timer.ModeSingle
+		    Do Until Not mWaiting
+		      App.YieldToNextThread
+		    Loop
+		  End If
+		  
+		  If mNextVolume <> Nil Then
+		    NextVolume = mNextVolume
 		    Return True
 		  End If
 		End Function
@@ -563,7 +598,16 @@ End
 
 	#tag Method, Flags = &h21
 		Private Function GetPasswordHandler(Sender As UnRAR.IteratorEx, ByRef ArchivePassword As String) As Boolean
-		  ArchivePassword = RARPasswordWin.GetPassword(Sender.ArchiveFile)
+		  If App.CurrentThread = Nil Then
+		    mPassword = RARPasswordWin.GetPassword(Sender.ArchiveFile)
+		  Else
+		    mWaiting = True
+		    GetPasswordTimer.Mode = Timer.ModeSingle
+		    Do Until Not mWaiting
+		      App.YieldToNextThread
+		    Loop
+		  End If
+		  ArchivePassword = mPassword
 		  Return True
 		End Function
 	#tag EndMethod
@@ -651,11 +695,27 @@ End
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
+		Private mNextVolume As FolderItem
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Private mOutputDir As FolderItem
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
+		Private mPassword As String
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
 		Private mSelectedIndex As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mVolumeNumber As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h21
+		Private mWaiting As Boolean
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
@@ -931,6 +991,22 @@ End
 		    mWorker.Kill
 		    CompleteTimer.Mode = Timer.ModeSingle
 		  End If
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events GetPasswordTimer
+	#tag Event
+		Sub Action()
+		  mPassword = RARPasswordWin.GetPassword(Archive.ArchiveFile)
+		  mWaiting = False
+		End Sub
+	#tag EndEvent
+#tag EndEvents
+#tag Events ChangeVolumeTimer
+	#tag Event
+		Sub Action()
+		  mNextVolume = RARVolumeSelect.GetVolume(Archive.ArchiveFile.Name, mVolumeNumber, mNextVolume)
+		  mWaiting = False
 		End Sub
 	#tag EndEvent
 #tag EndEvents
