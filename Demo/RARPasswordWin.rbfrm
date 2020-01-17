@@ -88,6 +88,7 @@ Begin Window RARPasswordWin
       Selectable      =   False
       TabIndex        =   3
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Please enter the password for the archive"
       TextAlign       =   0
       TextColor       =   &h000000

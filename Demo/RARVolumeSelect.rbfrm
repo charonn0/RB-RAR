@@ -46,6 +46,7 @@ Begin Window RARVolumeSelect
       Selectable      =   False
       TabIndex        =   0
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Archive:"
       TextAlign       =   2
       TextColor       =   &h000000
@@ -80,6 +81,7 @@ Begin Window RARVolumeSelect
       Selectable      =   False
       TabIndex        =   1
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Untitled"
       TextAlign       =   0
       TextColor       =   &h000000
@@ -114,6 +116,7 @@ Begin Window RARVolumeSelect
       Selectable      =   False
       TabIndex        =   2
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Volume #:"
       TextAlign       =   2
       TextColor       =   &h000000
@@ -148,6 +151,7 @@ Begin Window RARVolumeSelect
       Selectable      =   False
       TabIndex        =   3
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "Untitled"
       TextAlign       =   0
       TextColor       =   &h000000
@@ -213,6 +217,7 @@ Begin Window RARVolumeSelect
       Selectable      =   False
       TabIndex        =   8
       TabPanelIndex   =   0
+      TabStop         =   True
       Text            =   "The next volume in the archive can not be located. "
       TextAlign       =   0
       TextColor       =   &h000000

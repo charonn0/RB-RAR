@@ -1,5 +1,5 @@
 #tag Window
-Begin Window Window1
+Begin Window RARDemoWindow
    BackColor       =   16777215
    Backdrop        =   ""
    CloseButton     =   True
