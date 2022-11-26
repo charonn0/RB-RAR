@@ -8,7 +8,7 @@ The `Iterator` class implements the basic, older UnRAR interface. It does not su
 
 ## Example
 ### This example extracts an entire RAR archive into a directory
-```vbnet
+```realbasic
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim outputdir As FolderItem ' assume a valid directory
   Dim rar As New UnRAR.IteratorEx(archive)
@@ -29,7 +29,7 @@ You will need to ship the UnRAR.dll file with your application and install it in
 
 ## More examples
 ### Extract a single file
-```vbnet
+```realbasic
   Dim index As Integer = 2 ' the third file in the archive
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim outputfile As FolderItem ' assume a valid, non-existing file
@@ -39,7 +39,7 @@ You will need to ship the UnRAR.dll file with your application and install it in
   rar.Close
 ```
 ### Test an entire archive
-```vbnet
+```realbasic
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim rar As New UnRAR.IteratorEx(archive)
   Do
@@ -51,7 +51,7 @@ You will need to ship the UnRAR.dll file with your application and install it in
   rar.Close
 ```
 ### Test a single file
-```vbnet
+```realbasic
   Dim index As Integer = 2 ' the third file in the archive
   Dim archive As FolderItem ' assume a valid RAR archive
   Dim rar As New UnRAR.IteratorEx(archive)
