@@ -156,7 +156,7 @@ Protected Module UnRAR
 
 	#tag Note, Name = Copying
 		RB-RAR (https://github.com/charonn0/RB-RAR)
-		Copyright (c)2013-19 Andrew Lambert
+		Copyright (c)2013-23 Andrew Lambert
 		
 		Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 		documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
